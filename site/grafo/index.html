@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quem cuida de cada grupo da fauna brasileira — FaunaBR</title>
+<meta name="description" content="Taxonomistas do Catálogo Taxonômico da Fauna do Brasil e os grupos pelos quais respondem, com os grupos órfãos em destaque.">
+<link rel="stylesheet" href="../comum/base.css">
+<link rel="stylesheet" href="grafo.css">
+</head>
+<body>
+<header class="topo">
+  <a class="marca" href="../">FaunaBR · análises do Catálogo da Fauna</a>
+  <h1>Quem cuida de cada grupo da fauna brasileira</h1>
+  <button class="tema" type="button"></button>
+</header>
+<section class="abertura">
+  <p class="lead" id="lead">Carregando os dados do catálogo…</p>
+  <ul class="estados" id="estados" aria-label="Grupos por estado"></ul>
+</section>
+<nav class="abas" role="tablist" aria-label="Formas de ver">
+  <button role="tab" id="aba-lista" aria-controls="vista-lista" aria-selected="true">Grupos e responsáveis</button>
+  <button role="tab" id="aba-arvore" aria-controls="vista-arvore" aria-selected="false">Árvore dos grupos</button>
+</nav>
+<main>
+  <section id="vista-lista" role="tabpanel" aria-labelledby="aba-lista" class="vista lista">
+    <div class="coluna-lista">
+      <div class="busca">
+        <label for="busca">Buscar grupo ou taxonomista</label>
+        <input type="search" id="busca" placeholder="Ex.: Coleoptera, Silva" autocomplete="off"
+          role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="sugestoes">
+        <ul id="sugestoes" role="listbox" aria-label="Sugestões" hidden></ul>
+      </div>
+      <fieldset class="filtro" id="filtro-estado"><legend>Mostrar grupos</legend></fieldset>
+      <p class="contagem" id="contagem" aria-live="polite"></p>
+      <table>
+        <thead><tr><th scope="col">Grupo</th><th scope="col">Nível</th><th scope="col" class="num">Espécies</th></tr></thead>
+        <tbody id="lista"></tbody>
+      </table>
+    </div>
+    <div class="coluna-foco">
+      <fieldset class="filtro" id="filtro-perfil"><legend>Vínculos exibidos</legend></fieldset>
+      <div class="palco">
+        <div class="cy" id="cy-foco" role="img" aria-label="Grafo do grupo escolhido; o mesmo conteúdo está no painel ao lado"></div>
+        <div class="zoom" data-cy="foco"></div>
+      </div>
+    </div>
+    <aside class="painel" id="painel" aria-live="polite">
+      <p class="vazio">Escolha um grupo na lista para ver quem responde por ele e por quê.</p>
+    </aside>
+  </section>
+  <section id="vista-arvore" role="tabpanel" aria-labelledby="aba-arvore" class="vista arvore" hidden>
+    <div class="palco">
+      <div class="cy" id="cy-arvore" role="img" aria-label="Árvore radial dos grupos taxonômicos coloridos por estado"></div>
+      <div class="zoom" data-cy="arvore"></div>
+      <div class="nav-arvore">
+        <button type="button" id="arvore-voltar" disabled>← Voltar</button>
+        <button type="button" id="arvore-raiz" disabled>Raiz (Animalia)</button>
+      </div>
+    </div>
+    <aside class="painel" id="painel-arvore">
+      <h2>Como ler a árvore</h2>
+      <p>Animalia fica no centro e os filos ao redor. Cada círculo é um grupo; o tamanho mostra quantas espécies ele tem.
+      Clique em um grupo para abrir os subgrupos. Entre colchetes está o número de órfãos escondidos abaixo de um grupo fechado.</p>
+    </aside>
+  </section>
+</main>
+<footer class="rodape"></footer>
+<script src="../comum/vendor/cytoscape.min.js"></script>
+<script type="module" src="grafo.js"></script>
+</body>
+</html>

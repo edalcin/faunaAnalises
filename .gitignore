@@ -1,0 +1,16 @@
+# Dump, SQLite e outros dados brutos (grandes; nunca versionar)
+dados/
+*.dump
+*.sqlite
+
+# JSON gerado pelo pipeline (regenerável)
+site/*/data/
+
+# Ambiente
+.env
+.env.*
+!.env.example
+
+# Sistema
+.DS_Store
+__pycache__/

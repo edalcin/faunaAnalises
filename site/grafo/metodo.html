@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sobre e método — Quem cuida de cada grupo da fauna brasileira — FaunaBR</title>
+<link rel="stylesheet" href="../comum/base.css">
+<style>
+  .metodo { max-width: 72ch; padding: 1.5rem 1.5rem 2rem; }
+  .metodo h1 { font-size: 1.8rem; margin: 0 0 .5rem; }
+  .metodo .voltar { font-size: .9rem; }
+  .metodo h2 { font-size: 1.2rem; margin: 1.75rem 0 .3rem; }
+  .metodo dt { font-weight: 600; margin-top: .6rem; }
+  .metodo dd { margin: 0 0 0 1rem; }
+</style>
+</head>
+<body>
+<header class="topo">
+  <a class="marca" href="../">FaunaBR · análises do Catálogo da Fauna</a>
+  <button class="tema" type="button"></button>
+</header>
+<main class="metodo">
+  <p class="voltar"><a href="./">← Quem cuida de cada grupo da fauna brasileira</a></p>
+  <h1>Sobre e método</h1>
+  <p>Os dados vêm de uma cópia (dump) da base do Catálogo Taxonômico da Fauna do Brasil, de <span id="ref">—</span>. A cópia foi convertida para SQLite,
+  e um script calcula os números e gera os arquivos que esta análise lê. Nada é editado à mão. Cada nova cópia da base gera uma nova versão.</p>
+  <h2>Definições</h2>
+  <dl>
+    <dt>Grupo</dt>
+    <dd>Cada nó da árvore taxonômica do Catálogo a que se pode atribuir taxonomistas: filos, classes, ordens, famílias, gêneros e outros níveis.</dd>
+    <dt>Vínculo</dt>
+    <dd>A permissão que liga um taxonomista a um grupo, com um de três perfis: coordenação, colaboração ou só autoria.</dd>
+    <dt>Quem responde pelo grupo</dt>
+    <dd>A coordenação do próprio grupo. Se ele não tiver, vale a coordenação do grupo coordenado mais próximo acima dele na árvore.</dd>
+    <dt>Atividade</dt>
+    <dd>A data da última edição feita por um coordenador (inclusão, alteração, remoção ou movimentação de registros) dentro do grupo que coordena,
+    incluindo os subgrupos. Logins e consultas não contam. O histórico do Catálogo começa em 2015.</dd>
+    <dt>Estados</dt>
+    <dd><span class="estado ativo">Ativo</span>: a última edição tem até 1 ano.
+    <span class="estado risco">Em risco</span>: entre 1 e 3 anos.
+    <span class="estado orfao">Órfão</span>: mais de 3 anos, ou nenhuma coordenação acima nem abaixo.
+    <span class="estado agregador">Agregador</span>: sem coordenação no grupo nem acima dele, mas com coordenação em subgrupos;
+    a responsabilidade é exercida nos subgrupos.</dd>
+  </dl>
+  <h2>Por que 3 anos</h2>
+  <p>A edição no Catálogo acontece em campanhas, com pausas longas mesmo entre coordenadores ativos.
+  Um prazo menor chamaria de órfão quem só está entre duas campanhas.</p>
+  <h2>Dados pessoais</h2>
+  <p>Esta análise mostra nome e instituição dos taxonomistas, como o próprio Catálogo faz. Nunca mostra e-mail ou login.</p>
+</main>
+<footer class="rodape"></footer>
+<script type="module">
+  import { iniciar } from "../comum/comum.js";
+  const d = await (await fetch("data/grafo.json")).json();
+  iniciar({ referencia: d.referencia });
+  document.getElementById("ref").textContent = d.referencia.split("-").reverse().join("/");
+</script>
+</body>
+</html>

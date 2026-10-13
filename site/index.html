@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FaunaBR — análises do Catálogo Taxonômico da Fauna do Brasil</title>
+<meta name="description" content="Análises e visualizações sobre o conteúdo do Catálogo Taxonômico da Fauna do Brasil.">
+<link rel="stylesheet" href="comum/base.css">
+<style>
+  .inicio { max-width: 1000px; padding: 2.5rem 1.5rem 1rem; }
+  .inicio h1 { font-size: clamp(1.4rem, 2.2vw, 1.8rem); margin: 0 0 .75rem; max-width: 34ch; }
+  .inicio p { max-width: 68ch; color: var(--muted); font-size: 1.08rem; margin: 0; }
+  .analises { list-style: none; padding: 0 1.5rem; margin: 2rem 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.25rem; max-width: 1200px; }
+  .card { display: flex; flex-direction: column; gap: .6rem; height: 100%; padding: 1.25rem; border: 1px solid var(--line); border-top: 4px solid var(--orfao);
+    border-radius: 8px; background: var(--panel); }
+  .card h2 { margin: 0; font-size: 1.3rem; }
+  .card h2 a { color: var(--fg); text-decoration: none; }
+  .card h2 a::after { content: ""; position: absolute; inset: 0; } /* card inteiro clicável */
+  .card { position: relative; }
+  .card:hover { border-color: var(--fg); }
+  .card p { margin: 0; color: var(--muted); font-size: .95rem; }
+  .card .dado { margin-top: auto; color: var(--muted); font-size: .88rem; }
+  .card .dado b { font-family: var(--serif); font-size: 1.9rem; color: var(--orfao); margin-right: .35rem; }
+  .card .links { position: relative; z-index: 1; font-size: .88rem; }
+</style>
+</head>
+<body>
+<header class="topo">
+  <a class="marca" href="./">FaunaBR · análises do Catálogo da Fauna</a>
+  <button class="tema" type="button"></button>
+</header>
+<section class="inicio">
+  <h1>O que o Catálogo da Fauna do Brasil mostra sobre si mesmo</h1>
+  <p>O Catálogo Taxonômico da Fauna do Brasil reúne mais de 130 mil espécies, mantidas por mais de mil taxonomistas.
+  Estas páginas analisam o conteúdo do catálogo e o trabalho de quem o mantém, a partir de uma cópia integral da base de dados.</p>
+</section>
+<ul class="analises">
+  <li class="card">
+    <h2><a href="grafo/">Quem cuida de cada grupo da fauna brasileira</a></h2>
+    <p>Os taxonomistas e os grupos pelos quais respondem. Encontre os grupos órfãos, sem ninguém que exerça a coordenação, e veja por quê.</p>
+    <p class="dado"><b id="p-orfaos">—</b>dos grupos estão órfãos (<span id="n-orfaos"></span>)</p>
+    <p class="links"><a href="grafo/metodo.html">Sobre e método</a></p>
+  </li>
+</ul>
+<footer class="rodape"></footer>
+<script type="module">
+  import { iniciar } from "./comum/comum.js";
+  const d = await (await fetch("grafo/data/grafo.json")).json();
+  iniciar({ referencia: d.referencia });
+  const orfaos = d.grupos.filter((g) => g.estado === "orfao").length;
+  document.getElementById("p-orfaos").textContent =
+    (orfaos / d.grupos.length).toLocaleString("pt-BR", { style: "percent", minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  document.getElementById("n-orfaos").textContent = `${orfaos.toLocaleString("pt-BR")} de ${d.grupos.length.toLocaleString("pt-BR")}`;
+
+</script>
+</body>
+</html>
