@@ -18,6 +18,7 @@
 | 2026-10-13 | `scripts/exportar_grafo.py` | Exportador SQLite → `site/grafo/data/grafo.json` (~3 s). Regras: coordenador mais próximo; atividade = edição na subárvore; estados ativo ≤ 1 ano / em risco 1–3 / órfão > 3 ou sem coordenação / agregador. Data de referência = última data do `historico`. Nunca exporta e-mail/login. |
 | 2026-10-13 | `site/` | Site estático sem build (HTML + ES modules + CSS; Cytoscape.js 3.34.3 vendorizado). Página inicial em cartões; `grafo/` com lista, busca com sugestões, grafo de foco (grupo ou taxonomista) com zoom/reset, painel explicativo e aba Árvore radial com Voltar/Raiz; `grafo/metodo.html` com o método. Tema claro/escuro. |
 | 2026-10-13 | web.dalc.in | Publicado em <https://web.dalc.in/faunabr/> (cópia de `site/` para `S:\appsdata\web.dalc.in\faunabr`). Números: 4.154 grupos — 3.924 ativos, 83 em risco, 144 órfãos (3,5%), 3 agregadores; 6.047 espécies em grupos órfãos. |
+| 2026-10-13 | `dados/fauna.sqlite` | Limpeza: removidos os schemas auxiliares `carga`, `historico` (log de gatilhos, 26,4 M linhas), `postgrest` e `ipt_fauna` (19 tabelas). Ficaram as 78 tabelas de `public` + FTS5; 19,3 GB → 1,3 GB. Contagem das 78 tabelas idêntica ao backup; `integrity_check` ok; 98 FKs, 0 violações; `grafo.json` regenerado idêntico. Backup completo em `dados/fauna_backup_2026-10-13.sqlite`. `pg2sqlite.py` agora só converte `public`. `dados/modeloERctf.md` atualizado. |
 | 2026-10-13 | repositório | Arquivos separados do `faunabr` para este repositório; `README.md` com pipeline e publicação. |
 
 ## 2. Onde paramos

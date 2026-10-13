@@ -7,7 +7,8 @@ Uso: uv run pg2sqlite.py "postgresql://postgres:SENHA@127.0.0.1:5433/fauna" faun
 
 Copia: tabelas e matviews (dados), PK, UNIQUE, FK, índices btree simples.
 Não copia: views, funções, triggers, CHECK, defaults (sintaxe específica do PostgreSQL).
-Schemas != public viram prefixo: carga.correcao -> carga__correcao.
+Só o schema public: carga (staging), historico (auditoria em massa), postgrest e ipt_fauna
+(views de publicação) ficam de fora — não têm dado de espécie que não esteja em public.
 Tipos: int/bool -> INTEGER; float -> REAL; resto -> TEXT (timestamp/date/interval em ISO,
 json/hstore/arrays como JSON).
 """
@@ -17,16 +18,12 @@ import sys
 import psycopg
 
 DSN, OUT = sys.argv[1], sys.argv[2]
-SCHEMAS = ["public", "carga", "historico", "postgrest", "ipt_fauna", "reflora"]
+SCHEMAS = ["public"]
 BATCH = 50_000
 
 INT = {"int2", "int4", "int8", "bool"}
 REAL = {"float4", "float8", "numeric"}
 RAW = {"text", "varchar", "bpchar", "name"}
-
-
-def tn(schema, name):
-    return name if schema == "public" else f"{schema}__{name}"
 
 
 def q(ident):
@@ -51,7 +48,7 @@ def select_expr(col, typname, category):
 
 
 pg = psycopg.connect(DSN, autocommit=True)
-pg.execute("SET search_path = public, ipt_fauna, carga, historico")
+pg.execute("SET search_path = public")
 lite = sqlite3.connect(OUT)
 lite.executescript(
     "PRAGMA journal_mode=OFF; PRAGMA synchronous=OFF; PRAGMA foreign_keys=OFF;"
@@ -65,8 +62,6 @@ rels = pg.execute(
        where n.nspname = any(%s) and c.relkind in ('r','m') order by 2,3""",
     (SCHEMAS,),
 ).fetchall()
-names = [tn(s, t) for _, s, t, _, _ in rels]
-assert len(names) == len(set(names)), "colisão de nomes após prefixo"
 
 # --- DDL ---------------------------------------------------------------
 cons = {}
@@ -114,11 +109,11 @@ for oid, s, t, kind, populated in rels:
             lines.append(f"UNIQUE ({cl})")
         elif ctype == "f":
             lines.append(
-                f"FOREIGN KEY ({cl}) REFERENCES {q(tn(fns, frel))} "
+                f"FOREIGN KEY ({cl}) REFERENCES {q(frel)} "
                 f"({', '.join(q(c) for c in fcols)}) "
                 f"ON DELETE {ACTION[ondel]} ON UPDATE {ACTION[onupd]}"
             )
-    lite.execute(f"CREATE TABLE {q(tn(s, t))} ({', '.join(lines)})")
+    lite.execute(f"CREATE TABLE {q(t)} ({', '.join(lines)})")
     if populated:
         src = f"{q(s)}.{q(t)}"
     else:  # matview sem dados: roda a query de definição
@@ -130,7 +125,7 @@ bad = []
 for _, s, t, _, _ in rels:
     src, cols = meta[(s, t)]
     sel = ", ".join(e for _, e in cols)
-    ins = f"INSERT INTO {q(tn(s, t))} VALUES ({','.join('?' * len(cols))})"
+    ins = f"INSERT INTO {q(t)} VALUES ({','.join('?' * len(cols))})"
     n = 0
     with pg.transaction(), pg.cursor(name="c") as cur:
         cur.itersize = BATCH
@@ -143,8 +138,8 @@ for _, s, t, _, _ in rels:
     expected = pg.execute(f"select count(*) from {src} q").fetchone()[0]
     flag = "" if n == expected else f"  <-- DIVERGE (pg={expected})"
     if flag:
-        bad.append(tn(s, t))
-    print(f"{tn(s, t):45} {n:>10}{flag}", flush=True)
+        bad.append(t)
+    print(f"{t:45} {n:>10}{flag}", flush=True)
 
 # --- índices -------------------------------------------------------------
 for k, (ns, tbl, uniq, cols) in enumerate(
@@ -162,7 +157,7 @@ for k, (ns, tbl, uniq, cols) in enumerate(
     )
 ):
     lite.execute(
-        f"CREATE {'UNIQUE ' if uniq else ''}INDEX ix_{k} ON {q(tn(ns, tbl))} ({', '.join(q(c) for c in cols)})"
+        f"CREATE {'UNIQUE ' if uniq else ''}INDEX ix_{k} ON {q(tbl)} ({', '.join(q(c) for c in cols)})"
     )
 
 # Busca por substring/case-insensitive em nomes científicos: WHERE taxon_name_fts MATCH 'panthera leo'

@@ -29,7 +29,7 @@ flowchart LR
    A extensão `plv8` não existe na imagem; as 5 funções que dependem dela falham e não afetam os dados.
    O bind mount do Docker no Windows não enxerga compartilhamentos de rede: copie o dump para um disco local antes.
 2. **PostgreSQL → SQLite**: `uv run scripts/pg2sqlite.py "postgresql://postgres:<SENHA>@127.0.0.1:5433/fauna" dados/fauna.sqlite`
-   (tabelas, PK, UNIQUE, FK, índices e índice FTS5 de nomes; schemas fora de `public` viram prefixo `schema__tabela`).
+   (tabelas, PK, UNIQUE, FK, índices e índice FTS5 de nomes; só o schema `public` — `carga`, `historico`, `postgrest` e `ipt_fauna` ficam de fora).
    Depois: `docker rm -f faunabr-db`.
 3. **SQLite → JSON**: `python scripts/exportar_grafo.py` (lê `dados/fauna.sqlite`, escreve `site/grafo/data/grafo.json`; ~3 s).
 4. **Publicar**: copiar `site/` para `S:\appsdata\web.dalc.in\faunabr` (servidor nginx estático; já bloqueia `.sqlite`/`.db`).
