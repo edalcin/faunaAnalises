@@ -1,0 +1,15 @@
+/* PROTÓTIPO: só o comum às variantes. Rampa de completude (0% → 100%) em --q0..--q5. */
+:root { --q0: #e9e4d8; --q1: #d9d2a3; --q2: #a9c38a; --q3: #6fa77c; --q4: #3d8571; --q5: #1f5f5b; --falta: #c03a4d; }
+[data-theme="dark"] { --q0: #2a2a24; --q1: #4f5136; --q2: #5f7a48; --q3: #4f9471; --q4: #5cb59a; --q5: #8fdcc6; --falta: #ec6577; }
+body { display: flex; flex-direction: column; min-height: 100vh; }
+.topo h1 { font-size: 1.25rem; margin: 0; flex: 1; text-align: center; }
+.topo .marca { font-size: .9rem; color: var(--muted); }
+main { flex: 1; min-height: 0; }
+.carregando { padding: 2rem 1.5rem; color: var(--muted); }
+.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+.troca { position: fixed; z-index: 100; left: 50%; bottom: 1rem; transform: translateX(-50%); display: flex; align-items: center; gap: .6rem;
+  padding: .35rem .5rem; border-radius: 2rem; background: #111; color: #fff; box-shadow: 0 6px 24px rgb(0 0 0 / .35); font: 600 .85rem var(--sans); }
+.troca button { font: inherit; width: 2rem; height: 2rem; border: 0; border-radius: 50%; background: #333; color: #fff; cursor: pointer; }
+.troca button:hover { background: #555; }
+.troca span { min-width: 14rem; text-align: center; }

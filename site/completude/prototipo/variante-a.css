@@ -1,0 +1,147 @@
+/* Variante A, Matriz. Tudo sob .variante-a. */
+.variante-a { --nm: 17rem; --n: 4.6rem; padding: 1rem 1.5rem 5rem; }
+.variante-a .mut { color: var(--muted); }
+.variante-a .rot { display: block; font-size: .8rem; color: var(--muted); }
+
+/* cores da completude */
+.variante-a .q1 { background: var(--q1); } .variante-a .q2 { background: var(--q2); } .variante-a .q3 { background: var(--q3); }
+.variante-a .q4 { background: var(--q4); } .variante-a .q5 { background: var(--q5); } .variante-a .f { background: var(--falta); }
+.variante-a .na { background: repeating-linear-gradient(135deg, transparent 0 2px, var(--line) 2px 3px); box-shadow: inset 0 0 0 1px var(--line); }
+.variante-a .ac { background: var(--ativo); } .variante-a .si { background: var(--pessoa); } .variante-a .nvd { background: var(--risco); }
+
+/* faixa de resumo */
+.variante-a .faixa { display: flex; flex-wrap: wrap; gap: .8rem; margin-bottom: .6rem; }
+.variante-a .bloco { background: var(--panel); border: 1px solid var(--line); border-radius: .5rem; padding: .5rem .9rem; }
+.variante-a .comp { display: grid; grid-template-columns: auto 1fr; column-gap: 1rem; align-content: center; flex: 0 1 26rem; }
+.variante-a .comp .rot { grid-column: 1 / -1; }
+.variante-a .comp strong { grid-row: 2 / 4; align-self: center; }
+.variante-a .comp > span:not(.rot), .variante-a .comp small { grid-column: 2; }
+.variante-a .comp strong { font: 600 2.2rem/1.1 var(--serif); }
+.variante-a .comp small { color: var(--muted); margin-top: .2rem; }
+.variante-a .nomesbl { flex: 1 1 28rem; }
+.variante-a .emp { display: flex; height: 1.1rem; border-radius: .3rem; overflow: hidden; background: var(--line); margin: .35rem 0 .5rem; }
+.variante-a .emp .nvd { min-width: 4px; }
+.variante-a .leg { list-style: none; margin: 0; padding: 0; font-size: .9rem; }
+.variante-a .leg li { padding: .1rem 0; }
+.variante-a .leg .alerta { border-left: 3px solid var(--risco); padding-left: .5rem; margin-top: .2rem; }
+.variante-a .sw { display: inline-block; width: .7rem; height: .7rem; border-radius: 2px; margin-right: .25rem; vertical-align: baseline; }
+
+/* ferramentas */
+.variante-a .ferr { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem 1rem; margin-bottom: .3rem; }
+.variante-a .busca input { font: inherit; padding: .3rem .6rem; width: min(22rem, 100%); background: var(--panel); color: var(--fg); border: 1px solid var(--line); border-radius: .3rem; margin-left: .3rem; }
+.variante-a .info { color: var(--muted); flex: 1; }
+.variante-a button { font: inherit; color: var(--fg); }
+.variante-a .recolher, .variante-a .arvore { background: none; border: 1px solid var(--line); border-radius: 2rem; padding: .15rem .8rem; cursor: pointer; }
+.variante-a .recolher:disabled { opacity: .45; cursor: default; }
+.variante-a .ajuda { margin: 0 0 .5rem; font-size: .82rem; color: var(--muted); }
+
+/* matriz */
+.variante-a .matriz { height: min(86vh, 62rem); min-height: 26rem; overflow: auto; border: 1px solid var(--line); border-radius: .5rem; background: var(--panel); }
+.variante-a .lista { width: max-content; min-width: 100%; }
+.variante-a .cab { position: sticky; top: 0; z-index: 4; background: var(--bg); border-bottom: 1px solid var(--fg); }
+.variante-a .l { display: flex; align-items: center; height: 1.9rem; background: var(--panel); font-size: .88rem; scroll-margin-top: 14rem; }
+.variante-a .cab .l { background: var(--bg); }
+.variante-a .l > * { flex: none; }
+.variante-a .corpo .l { border-bottom: 1px solid color-mix(in srgb, var(--line) 50%, transparent); cursor: pointer; }
+.variante-a .corpo .l:hover { background: color-mix(in srgb, var(--panel) 88%, var(--fg)); }
+.variante-a .corpo .l.sel, .variante-a .l.global.sel { background: color-mix(in srgb, var(--panel) 80%, var(--pessoa)); }
+.variante-a .l:focus-visible { outline: 2px solid var(--pessoa); outline-offset: -2px; }
+.variante-a .l.global { height: 2.1rem; cursor: pointer; font-weight: 600; border-top: 1px solid var(--line); }
+.variante-a .nm { position: sticky; left: 0; z-index: 2; width: var(--nm); background: inherit; display: flex; align-items: center; min-width: 0; padding-left: calc(.3rem + var(--n, 0) * .7rem); overflow: hidden; }
+.variante-a .nm .t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.variante-a .nm small { margin-left: .4rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 0 1 auto; }
+.variante-a .nm .seta { width: 1.3rem; flex: none; color: var(--muted); text-align: center; font-size: .8rem; }
+.variante-a .corpo .nm .seta:hover { color: var(--fg); }
+.variante-a .esp, .variante-a .sin, .variante-a .nv { width: var(--n); text-align: right; padding-right: .6rem; font-variant-numeric: tabular-nums; }
+.variante-a .nv.tem { color: var(--risco); font-weight: 600; }
+.variante-a .tot { width: 4.6rem; display: flex; align-items: center; gap: .25rem; padding-left: .5rem; }
+.variante-a .tot b { font-weight: 500; font-variant-numeric: tabular-nums; }
+.variante-a .c, .variante-a .at { width: 1.4rem; margin: 0 1px; }
+.variante-a .c { height: 1.4rem; border-radius: 3px; display: block; }
+.variante-a .ini { margin-left: .6rem; }
+.variante-a .c.foco { outline: 2px solid var(--pessoa); outline-offset: 1px; }
+.variante-a .tot .c { margin: 0; }
+
+.variante-a .bandas { height: 3rem; align-items: stretch; padding-top: .3rem; }
+.variante-a .banda { margin-right: 1px; background: var(--line); border-radius: .25rem .25rem 0 0; font-size: .66rem; line-height: 1.15; padding: .2rem .25rem; overflow: hidden; display: flex; align-items: flex-end; }
+.variante-a .banda.d1 { background: color-mix(in srgb, var(--line) 55%, transparent); }
+.variante-a .nomes.l { height: 8.4rem; align-items: flex-end; padding-bottom: .3rem; }
+.variante-a .at { height: 8.2rem; display: flex; justify-content: center; cursor: default; }
+.variante-a .at span { writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; font-size: .72rem; max-height: 100%; overflow: hidden; text-overflow: ellipsis; }
+.variante-a .th button { background: none; border: 0; padding: 0 .2rem; cursor: pointer; font-size: .8rem; font-weight: 600; line-height: 1.15; text-align: inherit; width: 100%; }
+.variante-a .th.nm button { text-align: left; padding-left: 1.6rem; }
+.variante-a .th.tot button { text-align: left; }
+.variante-a .th[aria-sort="ascending"] button::after { content: " ▲"; font-size: .6rem; }
+.variante-a .th[aria-sort="descending"] button::after { content: " ▼"; font-size: .6rem; }
+.variante-a .vazio { padding: 1rem; color: var(--muted); }
+.variante-a .legenda { display: flex; flex-wrap: wrap; gap: .4rem 1.5rem; font-size: .82rem; color: var(--muted); margin: .5rem 0 1.5rem; }
+.variante-a .legenda span { display: inline-flex; align-items: center; gap: 2px; }
+.variante-a .legenda .c { width: .9rem; height: .9rem; margin: 0 1px; }
+.variante-a .legenda span .c:first-child { margin-right: .3rem; }
+
+/* tooltip */
+.variante-a .dica { position: fixed; z-index: 80; pointer-events: none; background: var(--fg); color: var(--bg); padding: .25rem .6rem; border-radius: .3rem; font-size: .82rem; white-space: nowrap; box-shadow: 0 3px 12px rgb(0 0 0 / .3); }
+
+/* barras */
+.variante-a .bar { display: block; height: .55rem; background: var(--line); border-radius: .3rem; overflow: hidden; min-width: 3rem; }
+.variante-a .bar i { display: block; height: 100%; background: var(--q4); }
+.variante-a .bar i.q1 { background: var(--q1); } .variante-a .bar i.q2 { background: var(--q2); } .variante-a .bar i.q3 { background: var(--q3); }
+.variante-a .bar i.q4 { background: var(--q4); } .variante-a .bar i.q5 { background: var(--q5); } .variante-a .bar i.f, .variante-a .bar i.na { background: none; }
+
+/* gaveta */
+.variante-a .gaveta { position: fixed; z-index: 60; top: 0; right: 0; bottom: 0; width: min(28rem, 100vw); overflow-y: auto; padding: 1rem 1.2rem 5rem; background: var(--panel); border-left: 1px solid var(--line); box-shadow: -8px 0 30px rgb(0 0 0 / .2); }
+.variante-a .gaveta[hidden], .variante-a .dica[hidden], .variante-a .vazio[hidden] { display: none; }
+@media (min-width: 1100px) { .variante-a.aberta { padding-right: 29.5rem; } }
+.variante-a .g-topo { display: flex; justify-content: space-between; align-items: flex-start; gap: .8rem; }
+.variante-a .gaveta h3 { font: 600 1.5rem/1.15 var(--serif); margin: 0; }
+.variante-a .gaveta h3.sec { font-size: 1.15rem; margin: 1.6rem 0 .3rem; padding-top: .8rem; border-top: 1px solid var(--line); }
+.variante-a .gaveta h4 { font: 600 .85rem var(--sans); margin: 1rem 0 .3rem; }
+.variante-a .gaveta p { margin: .2rem 0; }
+.variante-a .fechar { background: none; border: 1px solid var(--line); border-radius: 2rem; padding: .1rem .8rem; cursor: pointer; flex: none; }
+.variante-a .trilha { display: flex; flex-wrap: wrap; margin: .5rem 0; font-size: .82rem; }
+.variante-a .trilha button { background: none; border: 0; padding: 0; color: var(--pessoa); cursor: pointer; text-decoration: underline; }
+.variante-a .trilha button + button::before { content: "/"; display: inline-block; margin: 0 .35rem; color: var(--muted); text-decoration: none; }
+.variante-a .arvore { margin: .3rem 0 .6rem; }
+.variante-a .g-comp { margin: .6rem 0; padding: .6rem .8rem; border: 1px solid var(--line); border-radius: .5rem; }
+.variante-a .g-comp strong { font: 600 2rem/1.1 var(--serif); display: block; }
+.variante-a .g-comp .bar { margin-top: .4rem; height: .7rem; }
+.variante-a .atrs { list-style: none; margin: 0; padding: 0; font-size: .86rem; }
+.variante-a .atrs li { display: grid; grid-template-columns: 8.5rem 1fr 8.2rem; gap: .5rem; align-items: center; padding: .12rem 0; }
+.variante-a .atrs.doms li { grid-template-columns: 1fr 4rem 8.8rem; }
+.variante-a .atrs.doms span:first-child { white-space: normal; }
+.variante-a .atrs .r { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.variante-a .atrs span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.variante-a .h-nomes + .emp { margin-top: .3rem; }
+.variante-a .gaveta .leg { font-size: .84rem; }
+
+/* Domínio de Valores */
+.variante-a .campo { margin: .4rem 0 1.2rem; }
+.variante-a .campo h4 { margin-bottom: .1rem; }
+.variante-a .campo h4 small { font-weight: 400; color: var(--muted); }
+.variante-a .cobre { margin: 0 0 .2rem; font-size: .85rem; }
+.variante-a .campo > .bar { height: .4rem; margin-bottom: .4rem; }
+.variante-a .vals { list-style: none; margin: .2rem 0; padding: 0; font-size: .82rem; }
+.variante-a .vals li { display: grid; grid-template-columns: 10rem 1fr 3.8rem; gap: .5rem; align-items: center; padding: 1px 0; }
+.variante-a .vals .v { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.variante-a .vals .num { text-align: right; font-variant-numeric: tabular-nums; }
+.variante-a .vals .bar { height: .5rem; } .variante-a .vals .bar i { background: var(--pessoa); }
+.variante-a .campo summary { cursor: pointer; font-size: .82rem; }
+.variante-a .nunca summary { color: var(--falta); font-weight: 600; }
+.variante-a .chips { display: flex; flex-wrap: wrap; gap: .25rem; margin: .3rem 0 0; }
+.variante-a .chips span { border: 1px solid var(--falta); color: var(--falta); border-radius: .25rem; padding: 0 .35rem; font-size: .75rem; background: color-mix(in srgb, var(--falta) 10%, transparent); }
+
+/* Domínio de Valores global */
+.variante-a .gl { margin-top: 1rem; border: 1px solid var(--line); border-radius: .5rem; background: var(--panel); }
+.variante-a .gl > details > summary { cursor: pointer; padding: .8rem 1rem; font: 600 1.3rem var(--serif); }
+.variante-a .gl-corpo { padding: 0 1rem 1rem; }
+.variante-a .intro { max-width: 70ch; color: var(--muted); }
+.variante-a .cartoes { display: grid; grid-template-columns: repeat(auto-fill, minmax(21rem, 1fr)); gap: .5rem 2rem; }
+.variante-a .cartoes .vals li { grid-template-columns: 10rem 1fr 4rem; }
+
+@media (max-width: 760px) {
+  .variante-a { --nm: 11rem; padding: .8rem .6rem 5rem; }
+  .variante-a .comp strong { font-size: 2rem; }
+  .variante-a .atrs li { grid-template-columns: 6.5rem 1fr 7.5rem; }
+  .variante-a .atrs.doms li { grid-template-columns: 1fr 3rem 8.8rem; }
+  .variante-a .vals li, .variante-a .cartoes .vals li { grid-template-columns: 6rem 1fr 3.5rem; }
+}
