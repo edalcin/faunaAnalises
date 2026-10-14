@@ -2,7 +2,7 @@
 // Contrato de cada variante (variante-x.js): export const nome; export function montar(raiz, dados, { valores }).
 import { iniciar } from "../../comum/comum.js";
 
-const VARIANTES = ["A", "B", "C"];
+const VARIANTES = ["A"]; // B e C descartadas; fonte primária no commit 322ff98
 const url = new URL(location.href);
 let atual = VARIANTES.includes(url.searchParams.get("variante")) ? url.searchParams.get("variante") : "A";
 
