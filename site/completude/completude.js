@@ -381,13 +381,13 @@ ${glob ? "" : `<div class="acoes"><button type="button" class="ver-esp">Ver as $
 ${glob ? "" : `<p class="dir"><b>Espécies diretas</b> ${g.especies_diretas ? `${pct(g.diretas[0], g.diretas[1])} (${N(g.diretas[0])} de ${N(g.diretas[1])}), ${plural(g.especies_diretas, "espécie", "espécies")}` : "— nenhuma espécie direta, só subgrupos"}</p>`}
 <h4>Por domínio</h4><ul class="atrs doms">${doms}</ul>
 <h4 class="h-nomes">Nomes</h4>${nomesHTML(g.especies, g.sinonimos, g.nao_validados, glob ? `: ${nvDet}` : "")}
-<h3 class="sec">Os ${nA} atributos</h3>${atrs}
-${glob ? "" : `<h3 class="sec">Espécies</h3><div class="especies">
+<details class="sec" open><summary>Os ${nA} atributos</summary>${atrs}</details>
+<details class="sec" open><summary>Domínio de Valores</summary><div class="vals-corpo"><p class="mut">Carregando os valores…</p></div></details>
+${glob ? "" : `<details class="sec" open><summary>Espécies</summary><div class="especies">
 <p class="mut">Todas as espécies aceitas da subárvore, das menos completas para as mais completas.</p>
 <div class="esp-filtros"><input type="search" class="esp-busca" placeholder="Buscar espécie" aria-label="Buscar espécie">
 <select class="esp-falta" aria-label="Filtrar por atributo faltante"><option value="-1">Qualquer atributo</option>${atributos.map((a, i) => `<option value="${i}">Falta: ${esc(a.nome)}</option>`).join("")}</select></div>
-<p class="esp-info mut">Carregando as espécies…</p><ul class="esp-lista"></ul></div>`}
-<h3 class="sec">Domínio de Valores</h3><div class="vals-corpo"><p class="mut">Carregando os valores…</p></div>`;
+<p class="esp-info mut">Carregando as espécies…</p><ul class="esp-lista"></ul></div></details>`}`;
 }
 
 // ---- espécies do grupo (um arquivo por filo, carregado sob demanda) ----
@@ -406,7 +406,7 @@ function especies(g) {
   const sub = new Set([g.id]);
   for (const id of sub) for (const f of filhos.get(id) ?? []) sub.add(f.id);
   const alvo = gaveta.querySelector(".especies"), info = alvo.querySelector(".esp-info"), lista = alvo.querySelector(".esp-lista");
-  const busca = alvo.querySelector(".esp-busca"), falta = alvo.querySelector(".esp-falta");
+  const busca = alvo.querySelector(".esp-busca"), falta = alvo.querySelector(".esp-falta"), secao = alvo.parentElement;
   especiesDoFilo(filo.id).then((todas) => {
     if (sel !== g.id) return;
     const doGrupo = todas.filter((e) => sub.has(e.g)).sort((x, y) => x.p / x.a - y.p / y.a || x.nome.localeCompare(y.nome));
@@ -415,6 +415,7 @@ function especies(g) {
 ${e.p < e.a ? `<span class="esp-faltam mut">Falta: ${[...e.s].flatMap((c, i) => (c === "f" ? [esc(atributos[i].nome)] : [])).join(", ")}</span>` : ""}</li>`;
     // ponytail: rolagem infinita em blocos sem descarte; Arthropoda (111 mil) só chega ao fim se o leitor rolar tudo
     const mais = () => {
+      if (!secao.open) return; // seção recolhida: a lista não tem altura e carregaria tudo
       while (feitas < vis.length && lista.scrollHeight - lista.scrollTop - lista.clientHeight < 400) {
         lista.insertAdjacentHTML("beforeend", vis.slice(feitas, feitas + CHUNK).map(linha).join(""));
         feitas += CHUNK;
@@ -432,6 +433,7 @@ ${e.p < e.a ? `<span class="esp-faltam mut">Falta: ${[...e.s].flatMap((c, i) => 
     busca.addEventListener("input", filtrar);
     falta.addEventListener("change", filtrar);
     lista.addEventListener("scroll", mais, { passive: true });
+    secao.addEventListener("toggle", mais);
     filtrar();
   }).catch(() => {
     cacheFilo.delete(filo.id);
@@ -469,7 +471,11 @@ gaveta.addEventListener("click", (e) => {
   if (b.classList.contains("fechar")) fechar();
   else if (b.dataset.ir) abrir(+b.dataset.ir);
   else if (b.dataset.arv) mostrarNaArvore(+b.dataset.arv);
-  else if (b.classList.contains("ver-esp")) gaveta.querySelector(".especies").previousElementSibling.scrollIntoView({ behavior: "smooth" });
+  else if (b.classList.contains("ver-esp")) {
+    const s = gaveta.querySelector(".especies").parentElement;
+    s.open = true;
+    s.scrollIntoView({ behavior: "smooth" });
+  }
 });
 
 marcarOrdem();
