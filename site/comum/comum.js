@@ -1,7 +1,18 @@
-// Tema claro/escuro e rodapé comum a todas as páginas do FaunaBR.
+// Tema claro/escuro, crédito no cabeçalho e rodapé comum a todas as páginas do FaunaBR.
 const raiz = document.documentElement;
 const salvo = localStorage.getItem("tema");
 raiz.dataset.theme = salvo ?? (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+
+// crédito abaixo da marca; no topo do módulo para aparecer antes da carga dos dados
+const marca = document.querySelector(".topo .marca");
+if (marca) {
+  const bloco = document.createElement("div");
+  bloco.className = "marca-bloco";
+  marca.replaceWith(bloco);
+  bloco.append(marca);
+  bloco.insertAdjacentHTML("beforeend", `<p class="credito">Criado por Eduardo Dalcin - 2026 ·
+    <a href="https://github.com/edalcin/faunaAnalises">Código no GitHub</a></p>`);
+}
 
 export function iniciar({ referencia } = {}) {
   const botao = document.querySelector(".tema");
@@ -18,6 +29,5 @@ export function iniciar({ referencia } = {}) {
     <p>Fonte: <a href="https://fauna.jbrj.gov.br/fauna/listaBrasil/PrincipalUC/PrincipalUC.do?lingua=pt">Catálogo Taxonômico da Fauna do Brasil</a>,
     Instituto de Pesquisas Jardim Botânico do Rio de Janeiro (JBRJ)${data ? `, dados de ${data}` : ""}.</p>
     <p>Análise do projeto FaunaBR. Dados e textos derivados sob
-    <a href="https://creativecommons.org/licenses/by/4.0/deed.pt-br">CC BY 4.0</a>.</p>
-    <p>Criado por Eduardo Dalcin - 2026 · <a href="https://github.com/edalcin/faunaAnalises">Repositório no GitHub</a></p>`;
+    <a href="https://creativecommons.org/licenses/by/4.0/deed.pt-br">CC BY 4.0</a>.</p>`;
 }
