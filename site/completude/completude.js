@@ -375,7 +375,8 @@ function gavetaHTML(g) {
   return `<div class="g-topo"><div><h3>${esc(g.nome)}</h3><p class="mut">${glob ? "Todas as espécies aceitas do catálogo" : `${RANK[g.rank] ?? g.rank}, ${plural(g.especies, "espécie aceita", "espécies aceitas")}${nSub ? `, ${plural(nSub, "subgrupo direto", "subgrupos diretos")}` : ""}`}</p></div>
 <button type="button" class="fechar" aria-label="Fechar detalhe">Fechar</button></div>
 ${trilha.length ? `<nav class="trilha" aria-label="Posição na taxonomia">${trilha.map((x) => `<button type="button" data-ir="${x.id}">${esc(x.nome)}</button>`).join("")}</nav>` : ""}
-${glob ? "" : `<button type="button" class="arvore" data-arv="${g.id}">Mostrar na árvore</button>`}
+${glob ? "" : `<div class="acoes"><button type="button" class="ver-esp">Ver as ${plural(g.especies, "espécie", "espécies")}</button>
+<button type="button" class="arvore" data-arv="${g.id}">Mostrar na árvore</button></div>`}
 <div class="g-comp"><span class="rot">Completude${glob ? "" : " do grupo"}</span><strong>${pct(t.p, t.a, 1)}</strong><span class="mut">${N(t.p)} de ${N(t.a)} atributos preenchidos</span>${barra(t.p, t.a)}</div>
 ${glob ? "" : `<p class="dir"><b>Espécies diretas</b> ${g.especies_diretas ? `${pct(g.diretas[0], g.diretas[1])} (${N(g.diretas[0])} de ${N(g.diretas[1])}), ${plural(g.especies_diretas, "espécie", "espécies")}` : "— nenhuma espécie direta, só subgrupos"}</p>`}
 <h4>Por domínio</h4><ul class="atrs doms">${doms}</ul>
@@ -468,6 +469,7 @@ gaveta.addEventListener("click", (e) => {
   if (b.classList.contains("fechar")) fechar();
   else if (b.dataset.ir) abrir(+b.dataset.ir);
   else if (b.dataset.arv) mostrarNaArvore(+b.dataset.arv);
+  else if (b.classList.contains("ver-esp")) gaveta.querySelector(".especies").previousElementSibling.scrollIntoView({ behavior: "smooth" });
 });
 
 marcarOrdem();
