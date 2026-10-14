@@ -4,7 +4,7 @@
 
 **Estado em:** 2026-10-14 — duas análises publicadas em <https://web.dalc.in/faunabr/>: "Quem cuida de cada grupo da fauna brasileira" e "Completude de cada grupo da fauna brasileira" (com drill-down por espécie).
 
-**Estado do repositório:** `main`, sincronizado com `origin/main` (privado: [edalcin/faunaAnalises](https://github.com/edalcin/faunaAnalises)). `dados/` (dump + SQLite) e `site/*/data/` (JSON gerado) ficam fora do git.
+**Estado do repositório:** `main`, sincronizado com `origin/main` (público: [edalcin/faunaAnalises](https://github.com/edalcin/faunaAnalises)). `dados/` (dump + SQLite) e `site/*/data/` (JSON gerado) ficam fora do git.
 
 **Projeto irmão:** [faunabr](https://github.com/edalcin/faunabr) — pesquisa de arquitetura e glossário (`CONTEXT.md`). As decisões desta primeira análise estão no mapa wayfinder [faunabr#1](https://github.com/edalcin/faunabr/issues/1) (fechado) e nas pesquisas `faunabr/docs/research/inatividade-coordenadores.md` e `faunabr/docs/research/biblioteca-grafo.md`.
 
@@ -22,12 +22,15 @@
 | 2026-10-13 | repositório | Arquivos separados do `faunabr` para este repositório; `README.md` com pipeline e publicação. |
 | 2026-10-14 | `scripts/exportar_completude.py` | Exportador SQLite → `site/completude/data/completude.json` (grupos, ~1 MB) e `valores.json` (Domínio de Valores global e por grupo, ~2,3 MB); ~10 s. Regras no mapa wayfinder "Completude de cada grupo da fauna brasileira". Números: 137.866 espécies aceitas, completude 57,3% (1.286.630 de 2.246.777 atributos), 21.734 sinônimos, 499 nomes não validados, 1 aceita sem grupo. |
 | 2026-10-14 | `site/completude/` | Página publicada (variante A do protótipo, reescrita): matriz grupos × 18 atributos, gaveta do grupo, Domínio de Valores global; `metodo.html`; cartão em `site/index.html`. `prototipo/` removido (fonte nos commits 322ff98 e a398082). |
-| 2026-10-14 | `site/comum/comum.js` | Rodapé de todas as páginas: "Criado por Eduardo Dalcin - 2026" + link do repositório no GitHub. |
-| 2026-10-14 | `site/completude/` | Drill-down por espécie (#9, #10): seção "Espécies" na gaveta do grupo — subárvore inteira, nota crescente, filtro por atributo faltante, busca por nome, rolagem infinita. Exportador gera `data/especies/<filo>.json` (31 arquivos, 6,9 MB; Arthropoda 5,8 MB, 1,2 MB gzip), carregado sob demanda. Método atualizado. |
+| 2026-10-14 | `site/completude/` | Drill-down por espécie (#9, #10): seção "Espécies" no painel lateral do grupo ("gaveta" no código) — subárvore inteira, nota crescente, filtro por atributo faltante, busca por nome, rolagem infinita. Exportador gera `data/especies/<filo>.json` (31 arquivos, 6,9 MB; Arthropoda 5,8 MB, 1,2 MB gzip), carregado sob demanda. Método atualizado. |
+| 2026-10-14 | `site/completude/` | Painel lateral: botão "Ver as N espécies" no topo; seções "Os 18 atributos", "Domínio de Valores" e "Espécies" (nesta ordem) colapsáveis com `<details>`, abertas por padrão. |
+| 2026-10-14 | `site/comum/` | Cabeçalho de todas as páginas: marca (serif 1,2rem) e, abaixo, "Criado por Eduardo Dalcin - 2026 · Código no GitHub" (serif 1rem), ambos na cor do texto. Inserido por `comum.js`; saiu do rodapé. Repositório tornado público. |
 
 ## 2. Onde paramos
 
-Mapa wayfinder [Completude de cada grupo da fauna brasileira](https://github.com/edalcin/faunaAnalises/issues/1) fechado: destino atingido em <https://web.dalc.in/faunabr/completude/>. Atenção: o Cloudflare guarda JS/CSS por 4 h (`max-age=14400`); após publicar, purgar o cache ou esperar.
+Mapa wayfinder [Completude de cada grupo da fauna brasileira](https://github.com/edalcin/faunaAnalises/issues/1) fechado: destino atingido em <https://web.dalc.in/faunabr/completude/>. Sem issues abertas. Próximo passo: escolher o tema da próxima análise e abrir novo mapa wayfinder.
+
+**Publicação:** copiar `site/` para `S:\appsdata\web.dalc.in\faunabr` e purgar o cache do Cloudflare (JS/CSS ficam 4 h em cache, `max-age=14400`); conferir com Ctrl+F5. Última publicação: commit `7589b4f` — purga do Cloudflare para `comum/base.css` pendente de confirmação.
 
 ## 3. Pendências e ideias
 
