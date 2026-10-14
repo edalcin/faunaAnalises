@@ -25,12 +25,13 @@
 | 2026-10-14 | `site/completude/` | Drill-down por espécie (#9, #10): seção "Espécies" no painel lateral do grupo ("gaveta" no código) — subárvore inteira, nota crescente, filtro por atributo faltante, busca por nome, rolagem infinita. Exportador gera `data/especies/<filo>.json` (31 arquivos, 6,9 MB; Arthropoda 5,8 MB, 1,2 MB gzip), carregado sob demanda. Método atualizado. |
 | 2026-10-14 | `site/completude/` | Painel lateral: botão "Ver as N espécies" no topo; seções "Os 18 atributos", "Domínio de Valores" e "Espécies" (nesta ordem) colapsáveis com `<details>`, abertas por padrão. |
 | 2026-10-14 | `site/comum/` | Cabeçalho de todas as páginas: marca (serif 1,2rem) e, abaixo, "Criado por Eduardo Dalcin - 2026 · Código no GitHub" (serif 1rem), ambos na cor do texto. Inserido por `comum.js`; saiu do rodapé. Repositório tornado público. |
+| 2026-10-14 | `site/*.html` | Código de rastreamento Matomo (`matomo.dalc.in`, site 12) antes de `</head>` nas 5 páginas públicas. |
 
 ## 2. Onde paramos
 
 Mapa wayfinder [Completude de cada grupo da fauna brasileira](https://github.com/edalcin/faunaAnalises/issues/1) fechado: destino atingido em <https://web.dalc.in/faunabr/completude/>. Sem issues abertas. Próximo passo: escolher o tema da próxima análise e abrir novo mapa wayfinder.
 
-**Publicação:** copiar `site/` para `S:\appsdata\web.dalc.in\faunabr` e purgar o cache do Cloudflare (JS/CSS ficam 4 h em cache, `max-age=14400`); conferir com Ctrl+F5. Última publicação: commit `7589b4f` — purga do Cloudflare para `comum/base.css` pendente de confirmação.
+**Publicação:** copiar `site/` para `S:\appsdata\web.dalc.in\faunabr` e purgar o cache do Cloudflare (JS/CSS ficam 4 h em cache, `max-age=14400`); conferir com Ctrl+F5. Commit/push **não** publica — a cópia é manual. Última publicação: commit `51c4a83` (Matomo).
 
 ## 3. Pendências e ideias
 
