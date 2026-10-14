@@ -1,7 +1,7 @@
 """Exporta os JSON da análise "Completude de cada grupo da fauna brasileira" a partir do fauna.sqlite.
 
 Uso: python scripts/exportar_completude.py [fauna.sqlite] [pasta de saída]
-Padrão: dados/fauna.sqlite -> site/completude/data/{completude,valores}.json
+Padrão: dados/fauna.sqlite -> site/completude/data/{completude,valores}.json e data/especies/<filo>.json
 
 Regras (mapa wayfinder edalcin/faunaAnalises#1):
 - Unidade: espécie aceita (is_synonym = 0), rank ESPECIE ou SUB_ESPECIE.
@@ -10,6 +10,8 @@ Regras (mapa wayfinder edalcin/faunaAnalises#1):
   da subárvore; "diretas" = espécies cujo grupo mais próximo é este.
 - Domínios de Valores: os CHECK dos 18 atributos, lidos de dados/modeloERctf.md; espécie conta uma vez
   por valor. "% com valor" usa os aplicáveis do atributo ligado; VAZIO não conta como valor.
+- Espécies (#9): um arquivo por filo (id do grupo raiz) com [nome, grupo mais próximo, 18 chars
+  p = preenchido, f = faltante, n = não se aplica]; espécies sem grupo ficam fora.
 """
 import html
 import json
@@ -132,7 +134,7 @@ for tid, nid in no_de_taxon.items():
 # --- espécies aceitas e seus atributos -------------------------------------------------------------
 esp = q("""select tb.id, tb.dados_lista_brasil_fk, tb.parent_fk, tb.disponibilidade, tn.autor, tn.ano,
                   h.zoo_bank, h.species_id, h.bibliografia_referencia, json_type(h.campos_json, '$.bibliografia.main'),
-                  h.voucher_fauna, h.hospedeiro_fk, di.origem, di.endemica_brasil
+                  h.voucher_fauna, h.hospedeiro_fk, di.origem, di.endemica_brasil, tn.name_cache
            from taxon_base tb join taxon_name_base tn on tn.id = tb.taxon_name_base_fk
            left join dados_lista_brasil h on h.id = tb.dados_lista_brasil_fk
            left join distribuicao di on di.id = h.distribuicao_fk
@@ -154,7 +156,7 @@ ANO = re.compile(r"^\d{4}$")
 
 
 def atributos(e):
-    tid, hub, pai, disp, autor, ano, zoo, sid, bib, csl, vouch, hosp, origem, endem = e
+    tid, hub, pai, disp, autor, ano, zoo, sid, bib, csl, vouch, hosp, origem, endem, _ = e
     val = lambda cid: valores[cid].get(hub, ())
     formas = val("forma_vida")
     r = [None] * N
@@ -186,11 +188,14 @@ total = {"p": [0] * N, "a": [0] * N}
 val_global = {cid: {} for cid, *_ in CAMPOS}
 val_grupo = {}  # gid -> campo -> valor -> n ("" = espécies aplicáveis com algum valor)
 sem_grupo = 0
+por_filo = {}  # id do grupo raiz -> [[nome, grupo mais próximo, "pfn…"]]
 for e in esp:
     r = atributos(e)
     ns = nos(e[0])
     if not ns:
         sem_grupo += 1
+    else:
+        por_filo.setdefault(ns[-1], []).append([e[-1], ns[0], "".join("n" if x is None else "pf"[not x] for x in r)])
     for i, x in enumerate(r):
         if x is not None:
             total["a"][i] += 1
@@ -250,6 +255,11 @@ compacto = dict(ensure_ascii=False, separators=(",", ":"))
     "global": val_global,
     "grupos": val_grupo,
 }, **compacto), encoding="utf-8")
+(saida / "especies").mkdir(exist_ok=True)
+for f in (saida / "especies").glob("*.json"):
+    f.unlink()
+for filo, lista in por_filo.items():
+    (saida / "especies" / f"{filo}.json").write_text(json.dumps(lista, **compacto), encoding="utf-8")
 
 nota = sum(total["p"]) / sum(total["a"])
 print(f"{saida}: referência {ref}, {len(esp)} espécies aceitas ({sem_grupo} sem grupo), {len(grupos)} grupos, "

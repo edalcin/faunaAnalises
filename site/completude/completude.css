@@ -121,6 +121,12 @@ button { font: inherit; color: var(--fg); }
 .atrs span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .h-nomes + .emp { margin-top: .3rem; }
 .gaveta .leg { font-size: .84rem; }
+.esp-filtros { display: flex; gap: .4rem; margin: .5rem 0 .3rem; }
+.esp-filtros input, .esp-filtros select { font: inherit; font-size: .84rem; min-width: 0; flex: 1; padding: .25rem .5rem; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: .4rem; }
+.esp-lista { list-style: none; margin: .3rem 0 0; padding: 0 .2rem 0 0; max-height: 60vh; overflow-y: auto; font-size: .84rem; border-top: 1px solid var(--line); }
+.esp-lista li { display: grid; grid-template-columns: 1fr 3.5rem 6.5rem; gap: .2rem .5rem; align-items: center; padding: .3rem 0; border-bottom: 1px solid var(--line); }
+.esp-lista .r { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.esp-faltam { grid-column: 1 / -1; font-size: .78rem; }
 
 /* Domínio de Valores */
 .campo { margin: .4rem 0 1.2rem; }

@@ -381,7 +381,61 @@ ${glob ? "" : `<p class="dir"><b>Espécies diretas</b> ${g.especies_diretas ? `$
 <h4>Por domínio</h4><ul class="atrs doms">${doms}</ul>
 <h4 class="h-nomes">Nomes</h4>${nomesHTML(g.especies, g.sinonimos, g.nao_validados, glob ? `: ${nvDet}` : "")}
 <h3 class="sec">Os ${nA} atributos</h3>${atrs}
+${glob ? "" : `<h3 class="sec">Espécies</h3><div class="especies">
+<p class="mut">Todas as espécies aceitas da subárvore, das menos completas para as mais completas.</p>
+<div class="esp-filtros"><input type="search" class="esp-busca" placeholder="Buscar espécie" aria-label="Buscar espécie">
+<select class="esp-falta" aria-label="Filtrar por atributo faltante"><option value="-1">Qualquer atributo</option>${atributos.map((a, i) => `<option value="${i}">Falta: ${esc(a.nome)}</option>`).join("")}</select></div>
+<p class="esp-info mut">Carregando as espécies…</p><ul class="esp-lista"></ul></div>`}
 <h3 class="sec">Domínio de Valores</h3><div class="vals-corpo"><p class="mut">Carregando os valores…</p></div>`;
+}
+
+// ---- espécies do grupo (um arquivo por filo, carregado sob demanda) ----
+const cacheFilo = new Map();
+const especiesDoFilo = (f) => cacheFilo.get(f) ?? cacheFilo.set(f, fetch(`data/especies/${f}.json`).then((r) => {
+  if (!r.ok) throw new Error(r.status);
+  return r.json();
+}).then((l) => l.map(([nome, g, s]) => {
+  const p = s.split("p").length - 1, a = nA - (s.split("n").length - 1);
+  return { nome, g, s, p, a, n: norm(nome) };
+}))).get(f);
+
+function especies(g) {
+  let filo = g;
+  while (filo.pai != null) filo = porId.get(filo.pai);
+  const sub = new Set([g.id]);
+  for (const id of sub) for (const f of filhos.get(id) ?? []) sub.add(f.id);
+  const alvo = gaveta.querySelector(".especies"), info = alvo.querySelector(".esp-info"), lista = alvo.querySelector(".esp-lista");
+  const busca = alvo.querySelector(".esp-busca"), falta = alvo.querySelector(".esp-falta");
+  especiesDoFilo(filo.id).then((todas) => {
+    if (sel !== g.id) return;
+    const doGrupo = todas.filter((e) => sub.has(e.g)).sort((x, y) => x.p / x.a - y.p / y.a || x.nome.localeCompare(y.nome));
+    let vis = [], feitas = 0;
+    const linha = (e) => `<li><span class="esp-nome"><i>${esc(e.nome)}</i>${e.g === g.id ? "" : ` <span class="mut">· ${esc(porId.get(e.g).nome)}</span>`}</span>${barra(e.p, e.a)}<span class="r">${pct(e.p, e.a)} (${e.p} de ${e.a})</span>
+${e.p < e.a ? `<span class="esp-faltam mut">Falta: ${[...e.s].flatMap((c, i) => (c === "f" ? [esc(atributos[i].nome)] : [])).join(", ")}</span>` : ""}</li>`;
+    // ponytail: rolagem infinita em blocos sem descarte; Arthropoda (111 mil) só chega ao fim se o leitor rolar tudo
+    const mais = () => {
+      while (feitas < vis.length && lista.scrollHeight - lista.scrollTop - lista.clientHeight < 400) {
+        lista.insertAdjacentHTML("beforeend", vis.slice(feitas, feitas + CHUNK).map(linha).join(""));
+        feitas += CHUNK;
+      }
+    };
+    const filtrar = () => {
+      const q = norm(busca.value.trim()), i = +falta.value;
+      vis = doGrupo.filter((e) => (!q || e.n.includes(q)) && (i < 0 || e.s[i] === "f"));
+      feitas = 0;
+      lista.innerHTML = "";
+      lista.scrollTop = 0;
+      info.textContent = vis.length === doGrupo.length ? plural(doGrupo.length, "espécie", "espécies") : `${N(vis.length)} de ${plural(doGrupo.length, "espécie", "espécies")}`;
+      mais();
+    };
+    busca.addEventListener("input", filtrar);
+    falta.addEventListener("change", filtrar);
+    lista.addEventListener("scroll", mais, { passive: true });
+    filtrar();
+  }).catch(() => {
+    cacheFilo.delete(filo.id);
+    if (sel === g.id) info.textContent = "Não foi possível carregar as espécies.";
+  });
 }
 function abrir(id) {
   sel = id;
@@ -392,6 +446,7 @@ function abrir(id) {
   gaveta.hidden = false;
   gaveta.innerHTML = gavetaHTML(g);
   gaveta.scrollTop = 0;
+  if (id !== -1) especies(g);
   const alvo = gaveta.querySelector(".vals-corpo");
   valores().then((v) => {
     if (sel !== id) return;

@@ -2,7 +2,7 @@
 
 > Ponto de entrada de qualquer nova sessão. Ao final de cada sessão, atualizar (i) a data do estado, (ii) o estado do repositório, (iii) o que foi feito e (iv) as próximas ações. Caminhos relativos à raiz do repositório.
 
-**Estado em:** 2026-10-14 — duas análises publicadas em <https://web.dalc.in/faunabr/>: "Quem cuida de cada grupo da fauna brasileira" e "Completude de cada grupo da fauna brasileira" (esta ainda sem o drill-down por espécie).
+**Estado em:** 2026-10-14 — duas análises publicadas em <https://web.dalc.in/faunabr/>: "Quem cuida de cada grupo da fauna brasileira" e "Completude de cada grupo da fauna brasileira" (com drill-down por espécie).
 
 **Estado do repositório:** `main`, sincronizado com `origin/main` (privado: [edalcin/faunaAnalises](https://github.com/edalcin/faunaAnalises)). `dados/` (dump + SQLite) e `site/*/data/` (JSON gerado) ficam fora do git.
 
@@ -22,14 +22,16 @@
 | 2026-10-13 | repositório | Arquivos separados do `faunabr` para este repositório; `README.md` com pipeline e publicação. |
 | 2026-10-14 | `scripts/exportar_completude.py` | Exportador SQLite → `site/completude/data/completude.json` (grupos, ~1 MB) e `valores.json` (Domínio de Valores global e por grupo, ~2,3 MB); ~10 s. Regras no mapa wayfinder "Completude de cada grupo da fauna brasileira". Números: 137.866 espécies aceitas, completude 57,3% (1.286.630 de 2.246.777 atributos), 21.734 sinônimos, 499 nomes não validados, 1 aceita sem grupo. |
 | 2026-10-14 | `site/completude/` | Página publicada (variante A do protótipo, reescrita): matriz grupos × 18 atributos, gaveta do grupo, Domínio de Valores global; `metodo.html`; cartão em `site/index.html`. `prototipo/` removido (fonte nos commits 322ff98 e a398082). |
+| 2026-10-14 | `site/comum/comum.js` | Rodapé de todas as páginas: "Criado por Eduardo Dalcin - 2026" + link do repositório no GitHub. |
+| 2026-10-14 | `site/completude/` | Drill-down por espécie (#9, #10): seção "Espécies" na gaveta do grupo — subárvore inteira, nota crescente, filtro por atributo faltante, busca por nome, rolagem infinita. Exportador gera `data/especies/<filo>.json` (31 arquivos, 6,9 MB; Arthropoda 5,8 MB, 1,2 MB gzip), carregado sob demanda. Método atualizado. |
 
 ## 2. Onde paramos
 
-Mapa wayfinder [Completude de cada grupo da fauna brasileira](https://github.com/edalcin/faunaAnalises/issues/1) (destino: página publicada, execução no mapa). Fechado agora: "Implementar e publicar a página de completude" — página no ar em <https://web.dalc.in/faunabr/completude/>. Fronteira: [Como a página mostra a completude de cada espécie?](https://github.com/edalcin/faunaAnalises/issues/9) (grilling; drill-down por espécie, que falta para o destino).
+Mapa wayfinder [Completude de cada grupo da fauna brasileira](https://github.com/edalcin/faunaAnalises/issues/1) fechado: destino atingido em <https://web.dalc.in/faunabr/completude/>. Atenção: o Cloudflare guarda JS/CSS por 4 h (`max-age=14400`); após publicar, purgar o cache ou esperar.
 
 ## 3. Pendências e ideias
 
-- [ ] **Próximas análises da série** — "Completude" em andamento (mapa acima). Cada uma: nova pasta `site/<slug>/`, exportador em `scripts/`, cartão em `site/index.html`, página de método própria.
+- [ ] **Próximas análises da série** — Cada uma: nova pasta `site/<slug>/`, exportador em `scripts/`, cartão em `site/index.html`, página de método própria.
 - [ ] **Atualização com novo dump** — o pipeline é manual (README §Pipeline). Considerar um script único (dump → SQLite → JSON → cópia) se a atualização ficar frequente.
 - [ ] **Usuários "(inativo)"** — alguns `usuario.nome_completo` do CTFB trazem "(inativo)", embora `status` seja ATIVO para todos. Avaliar se isso deve pesar no estado do grupo.
 - [ ] **Views do PostgreSQL** — as 26 views, funções e triggers não foram para o SQLite. Reescrever as que uma análise precisar.
