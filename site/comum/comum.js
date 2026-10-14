@@ -17,6 +17,7 @@ export function iniciar({ referencia } = {}) {
   document.querySelector(".rodape").innerHTML = `
     <p>Fonte: <a href="https://fauna.jbrj.gov.br/fauna/listaBrasil/PrincipalUC/PrincipalUC.do?lingua=pt">Catálogo Taxonômico da Fauna do Brasil</a>,
     Instituto de Pesquisas Jardim Botânico do Rio de Janeiro (JBRJ)${data ? `, dados de ${data}` : ""}.</p>
-    <p>Análise do projeto FaunaBR, por Eduardo Dalcin. Dados e textos derivados sob
-    <a href="https://creativecommons.org/licenses/by/4.0/deed.pt-br">CC BY 4.0</a>.</p>`;
+    <p>Análise do projeto FaunaBR. Dados e textos derivados sob
+    <a href="https://creativecommons.org/licenses/by/4.0/deed.pt-br">CC BY 4.0</a>.</p>
+    <p>Criado por Eduardo Dalcin - 2026 · <a href="https://github.com/edalcin/faunaAnalises">Repositório no GitHub</a></p>`;
 }
