@@ -23,7 +23,7 @@
 
 ## 2. Onde paramos
 
-Segunda análise, **"Completude de cada grupo da fauna brasileira"**, mapeada no wayfinder [Completude de cada grupo da fauna brasileira](https://github.com/edalcin/faunaAnalises/issues/1) (destino: página publicada, execução no mapa). Próximo passo: trabalhar o mapa — primeiro ticket livre é "O que é um Nome Validado?"; a pesquisa "Quanto está preenchido cada atributo de espécie, por domínio?" (`docs/research/perfil-preenchimento.md`) desbloqueia os tickets de métrica e de relatório.
+Segunda análise, **"Completude de cada grupo da fauna brasileira"**, mapeada no wayfinder [Completude de cada grupo da fauna brasileira](https://github.com/edalcin/faunaAnalises/issues/1) (destino: página publicada, execução no mapa). Fechados: "Quanto está preenchido cada atributo de espécie, por domínio?", "O que é um Nome Validado?", "Que atributos compõem a completude de uma espécie?" e "Como a completude de um grupo resume suas espécies?". Fronteira: "O que mostra o relatório por Domínio de Valores?" (grilling) e "Como a página de completude deve parecer e se comportar?" (prototype); depois "Implementar e publicar a página de completude".
 
 ## 3. Pendências e ideias
 
