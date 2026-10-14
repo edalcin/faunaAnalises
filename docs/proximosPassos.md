@@ -2,7 +2,7 @@
 
 > Ponto de entrada de qualquer nova sessão. Ao final de cada sessão, atualizar (i) a data do estado, (ii) o estado do repositório, (iii) o que foi feito e (iv) as próximas ações. Caminhos relativos à raiz do repositório.
 
-**Estado em:** 2026-10-13 — primeira análise ("Quem cuida de cada grupo da fauna brasileira") publicada em <https://web.dalc.in/faunabr/>.
+**Estado em:** 2026-10-14 — primeira análise ("Quem cuida de cada grupo da fauna brasileira") publicada em <https://web.dalc.in/faunabr/>; segunda análise ("Completude de cada grupo da fauna brasileira") mapeada em wayfinder.
 
 **Estado do repositório:** `main`, sincronizado com `origin/main` (privado: [edalcin/faunaAnalises](https://github.com/edalcin/faunaAnalises)). `dados/` (dump + SQLite) e `site/*/data/` (JSON gerado) ficam fora do git.
 
@@ -23,11 +23,11 @@
 
 ## 2. Onde paramos
 
-Primeira análise publicada e aprovada pelo autor ("nesta primeira versão"). Não há trabalho em andamento.
+Segunda análise, **"Completude de cada grupo da fauna brasileira"**, mapeada no wayfinder [Completude de cada grupo da fauna brasileira](https://github.com/edalcin/faunaAnalises/issues/1) (destino: página publicada, execução no mapa). Próximo passo: trabalhar o mapa — primeiro ticket livre é "O que é um Nome Validado?"; a pesquisa "Quanto está preenchido cada atributo de espécie, por domínio?" (`docs/research/perfil-preenchimento.md`) desbloqueia os tickets de métrica e de relatório.
 
 ## 3. Pendências e ideias
 
-- [ ] **Próximas análises da série** — ainda não definidas. Cada uma: nova pasta `site/<slug>/`, exportador em `scripts/`, cartão em `site/index.html`, página de método própria.
+- [ ] **Próximas análises da série** — "Completude" em andamento (mapa acima). Cada uma: nova pasta `site/<slug>/`, exportador em `scripts/`, cartão em `site/index.html`, página de método própria.
 - [ ] **Atualização com novo dump** — o pipeline é manual (README §Pipeline). Considerar um script único (dump → SQLite → JSON → cópia) se a atualização ficar frequente.
 - [ ] **Usuários "(inativo)"** — alguns `usuario.nome_completo` do CTFB trazem "(inativo)", embora `status` seja ATIVO para todos. Avaliar se isso deve pesar no estado do grupo.
 - [ ] **Views do PostgreSQL** — as 26 views, funções e triggers não foram para o SQLite. Reescrever as que uma análise precisar.
