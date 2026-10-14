@@ -9,6 +9,7 @@ Projeto irmão de [faunabr](https://github.com/edalcin/faunabr), que guarda a pe
 | Página | O que mostra |
 |---|---|
 | `site/grafo/` | Quem cuida de cada grupo da fauna brasileira: taxonomistas, grupos que coordenam e grupos órfãos. Método em `site/grafo/metodo.html`. |
+| `site/completude/` | Completude de cada grupo da fauna brasileira: quanto dos 18 atributos das espécies aceitas está preenchido, por grupo e por domínio, com o Domínio de Valores de cada atributo. Método em `site/completude/metodo.html`. |
 
 ## Pipeline
 
@@ -17,7 +18,9 @@ flowchart LR
   D[dump PostgreSQL<br>dados/*.dump] -->|pg_restore em Docker| P[(PostgreSQL temporário)]
   P -->|scripts/pg2sqlite.py| S[(dados/fauna.sqlite)]
   S -->|scripts/exportar_grafo.py| J[site/grafo/data/grafo.json]
+  S -->|scripts/exportar_completude.py| C[site/completude/data/<br>completude.json, valores.json]
   J --> W[site/ copiado para<br>web.dalc.in/faunabr]
+  C --> W
 ```
 
 1. **Dump → PostgreSQL** (Docker local, imagem `postgres:18`):
@@ -31,7 +34,9 @@ flowchart LR
 2. **PostgreSQL → SQLite**: `uv run scripts/pg2sqlite.py "postgresql://postgres:<SENHA>@127.0.0.1:5433/fauna" dados/fauna.sqlite`
    (tabelas, PK, UNIQUE, FK, índices e índice FTS5 de nomes; só o schema `public` — `carga`, `historico`, `postgrest` e `ipt_fauna` ficam de fora).
    Depois: `docker rm -f faunabr-db`.
-3. **SQLite → JSON**: `python scripts/exportar_grafo.py` (lê `dados/fauna.sqlite`, escreve `site/grafo/data/grafo.json`; ~3 s).
+3. **SQLite → JSON**:
+   - `python scripts/exportar_grafo.py` (lê `dados/fauna.sqlite`, escreve `site/grafo/data/grafo.json`; ~3 s).
+   - `python scripts/exportar_completude.py` (lê `dados/fauna.sqlite` e as listas CHECK de `dados/modeloERctf.md`, escreve `site/completude/data/{completude,valores}.json`; ~10 s).
 4. **Publicar**: copiar `site/` para `S:\appsdata\web.dalc.in\faunabr` (servidor nginx estático; já bloqueia `.sqlite`/`.db`).
    ```bash
    cp -r site/. /s/appsdata/web.dalc.in/faunabr/

@@ -22,6 +22,7 @@
   .card .dado { margin-top: auto; color: var(--muted); font-size: .88rem; }
   .card .dado b { font-family: var(--serif); font-size: 1.9rem; color: var(--orfao); margin-right: .35rem; }
   .card .links { position: relative; z-index: 1; font-size: .88rem; }
+  .card.completude { border-top-color: var(--ativo); } .card.completude .dado b { color: var(--ativo); }
 </style>
 </head>
 <body>
@@ -41,6 +42,12 @@
     <p class="dado"><b id="p-orfaos">—</b>dos grupos estão órfãos (<span id="n-orfaos"></span>)</p>
     <p class="links"><a href="grafo/metodo.html">Sobre e método</a></p>
   </li>
+  <li class="card completude">
+    <h2><a href="completude/">Completude de cada grupo da fauna brasileira</a></h2>
+    <p>Quanto da ficha de cada espécie está preenchido, por grupo e por atributo: nomenclatura, distribuição, biologia e referências. Veja onde faltam dados.</p>
+    <p class="dado"><b id="p-completude">—</b>dos atributos das espécies aceitas estão preenchidos</p>
+    <p class="links"><a href="completude/metodo.html">Sobre e método</a></p>
+  </li>
 </ul>
 <footer class="rodape"></footer>
 <script type="module">
@@ -51,6 +58,10 @@
   document.getElementById("p-orfaos").textContent =
     (orfaos / d.grupos.length).toLocaleString("pt-BR", { style: "percent", minimumFractionDigits: 1, maximumFractionDigits: 1 });
   document.getElementById("n-orfaos").textContent = `${orfaos.toLocaleString("pt-BR")} de ${d.grupos.length.toLocaleString("pt-BR")}`;
+  const c = await (await fetch("completude/data/completude.json")).json();
+  const soma = (v) => v.reduce((s, x) => s + x, 0);
+  document.getElementById("p-completude").textContent = (soma(c.total.p) / soma(c.total.a))
+    .toLocaleString("pt-BR", { style: "percent", minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
 </script>
 </body>

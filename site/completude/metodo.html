@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sobre e método — Completude de cada grupo da fauna brasileira — FaunaBR</title>
+<link rel="stylesheet" href="../comum/base.css">
+<style>
+  .metodo { max-width: 76ch; padding: 1.5rem 1.5rem 2rem; }
+  .metodo h1 { font-size: 1.8rem; margin: 0 0 .5rem; }
+  .metodo .voltar { font-size: .9rem; }
+  .metodo h2 { font-size: 1.2rem; margin: 1.75rem 0 .3rem; }
+  .metodo dt { font-weight: 600; margin-top: .6rem; }
+  .metodo dd { margin: 0 0 0 1rem; }
+  .metodo table { border-collapse: collapse; font-size: .92rem; margin: .5rem 0; }
+  .metodo th, .metodo td { text-align: left; vertical-align: top; padding: .3rem .6rem; border-bottom: 1px solid var(--line); }
+  .metodo code { font-size: .88em; }
+</style>
+</head>
+<body>
+<header class="topo">
+  <a class="marca" href="../">FaunaBR · análises do Catálogo da Fauna</a>
+  <button class="tema" type="button"></button>
+</header>
+<main class="metodo">
+  <p class="voltar"><a href="./">← Completude de cada grupo da fauna brasileira</a></p>
+  <h1>Sobre e método</h1>
+  <p>Os dados vêm de uma cópia (dump) da base do Catálogo Taxonômico da Fauna do Brasil, de <span id="ref">—</span>. A cópia foi convertida para SQLite,
+  e um script calcula os números e gera os arquivos que esta análise lê. Nada é editado à mão. Cada nova cópia da base gera uma nova versão.</p>
+  <p>A análise mede quanto da ficha de cada espécie está preenchido. Ela não avalia se o conteúdo está correto.</p>
+
+  <h2>Definições</h2>
+  <dl>
+    <dt>Espécie</dt>
+    <dd>Cada nome aceito do Catálogo no nível de espécie ou subespécie. As duas contam como unidades iguais. Sinônimos e nomes não validados não recebem nota; aparecem só como contagens.</dd>
+    <dt>Nome validado e nome não validado</dt>
+    <dd>Um nome é validado quando o Catálogo diz se ele é aceito ou sinônimo. Um nome sem essa informação é não validado; a página mostra quantos são e a disponibilidade de cada um.</dd>
+    <dt>Atributo preenchido</dt>
+    <dd>Um atributo está preenchido quando tem conteúdo útil: texto que não fica vazio depois de remover HTML, entidades e espaços, ou um registro ligado que tem conteúdo real.
+    O ambiente <code>VAZIO</code> conta como não preenchido.</dd>
+    <dt>Não se aplica</dt>
+    <dd>Alguns atributos só fazem sentido para algumas espécies. Quando não se aplicam, saem da conta: não somam nem como preenchidos nem como faltantes.
+      <ul>
+        <li><b>Hospedeiro</b>: só para espécies com forma de vida parasita (ectoparasito, endoparasito, ectoparasitoide, endoparasitoide, hiperparasitoide). Hospedeiro indeterminado conta como preenchido.</li>
+        <li><b>Países</b>: só para espécies marcadas como não endêmicas do Brasil. Conta como preenchido quando há algum país além do Brasil.</li>
+        <li>Se o atributo que decide a aplicação está vazio, o atributo dependente não se aplica. Assim, uma lacuna não é penalizada duas vezes.</li>
+      </ul></dd>
+    <dt>Completude da espécie</dt>
+    <dd>Atributos preenchidos ÷ atributos aplicáveis, todos com o mesmo peso. Por exemplo, 12 de 17.</dd>
+    <dt>Grupo</dt>
+    <dd>Cada nó da árvore taxonômica do Catálogo (filos, classes, ordens, famílias, gêneros e outros níveis), os mesmos grupos de
+    <a href="../grafo/">Quem cuida de cada grupo da fauna brasileira</a>.</dd>
+    <dt>Completude do grupo</dt>
+    <dd>A soma dos atributos preenchidos ÷ a soma dos atributos aplicáveis de todas as espécies do grupo, incluindo as de todos os subgrupos.
+    Não é a média das notas das espécies: a soma dá o mesmo número em qualquer nível da árvore. O detalhe do grupo mostra também a nota das
+    <b>espécies diretas</b>, as que ficam neste grupo e em nenhum subgrupo dele.</dd>
+    <dt>Domínio de Valores</dt>
+    <dd>A lista de valores permitidos de uma coluna do Catálogo (restrição CHECK da base). Para os atributos com essa lista, a página mostra quantas
+    espécies usam cada valor e quais valores nenhuma espécie usa. Uma espécie conta uma vez em cada valor que tem.
+    O percentual “com valor” usa só as espécies a que o atributo se aplica; o ambiente <code>VAZIO</code> aparece na lista, mas não conta como valor.</dd>
+  </dl>
+
+  <h2>Os 18 atributos</h2>
+  <table>
+    <thead><tr><th scope="col">Domínio</th><th scope="col">Atributos</th></tr></thead>
+    <tbody>
+      <tr><td>Núcleo taxonômico</td><td>autor; ano (4 dígitos); disponibilidade; táxon-pai; ID externo (ZooBank LSID ou <code>species_id</code>)</td></tr>
+      <tr><td>Distribuição geográfica e ecológica</td><td>origem; endemismo; ambiente (marinho ou epicontinental); UF de ocorrência; países; domínio biogeográfico (marinho, epicontinental, bacia hidrográfica ou região marinha)</td></tr>
+      <tr><td>Atributos biológicos e hospedeiros</td><td>forma de vida; substrato; hospedeiro; nome vernáculo</td></tr>
+      <tr><td>Referências, vouchers e mídia</td><td>publicação original (texto ou referência estruturada); material-tipo (primário, secundário ou coletivo, com o tipo informado); voucher</td></tr>
+    </tbody>
+  </table>
+  <p>Ficam fora: os campos derivados do nome (gênero, epítetos, nome completo), os opcionais por natureza (subgênero, combinação),
+  os editoriais e os que estão sempre vazios na base. Imagens também ficam fora da nota: o Catálogo não tem nenhuma imagem de espécie registrada.</p>
+
+  <h2>Cores</h2>
+  <p>Na matriz, cada célula é um grupo × atributo. Vermelho: nenhuma espécie aplicável tem o atributo. Do amarelo-claro ao verde-escuro:
+  de poucas a todas as espécies com o atributo. Hachura: o atributo não se aplica a nenhuma espécie do grupo. As cores não têm faixas de qualidade.</p>
+
+  <h2>Limites</h2>
+  <ul>
+    <li>Um único retrato: a página não mostra como a completude mudou com o tempo.</li>
+    <li>Atributo preenchido não quer dizer atributo correto ou completo. Uma espécie com uma UF registrada conta como preenchida em “UF de ocorrência”.</li>
+    <li>Espécies aceitas sem grupo no Catálogo (<span id="sem-grupo">—</span> nesta cópia) entram na nota de toda a fauna, mas em nenhum grupo.</li>
+  </ul>
+</main>
+<footer class="rodape"></footer>
+<script type="module">
+  import { iniciar } from "../comum/comum.js";
+  const d = await (await fetch("data/completude.json")).json();
+  iniciar({ referencia: d.referencia });
+  document.getElementById("ref").textContent = d.referencia.split("-").reverse().join("/");
+  document.getElementById("sem-grupo").textContent = d.sem_grupo.toLocaleString("pt-BR");
+</script>
+</body>
+</html>

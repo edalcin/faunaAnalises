@@ -2,7 +2,7 @@
 
 > Ponto de entrada de qualquer nova sessão. Ao final de cada sessão, atualizar (i) a data do estado, (ii) o estado do repositório, (iii) o que foi feito e (iv) as próximas ações. Caminhos relativos à raiz do repositório.
 
-**Estado em:** 2026-10-14 — primeira análise ("Quem cuida de cada grupo da fauna brasileira") publicada em <https://web.dalc.in/faunabr/>; segunda análise ("Completude de cada grupo da fauna brasileira") mapeada em wayfinder.
+**Estado em:** 2026-10-14 — duas análises publicadas em <https://web.dalc.in/faunabr/>: "Quem cuida de cada grupo da fauna brasileira" e "Completude de cada grupo da fauna brasileira" (esta ainda sem o drill-down por espécie).
 
 **Estado do repositório:** `main`, sincronizado com `origin/main` (privado: [edalcin/faunaAnalises](https://github.com/edalcin/faunaAnalises)). `dados/` (dump + SQLite) e `site/*/data/` (JSON gerado) ficam fora do git.
 
@@ -20,10 +20,12 @@
 | 2026-10-13 | web.dalc.in | Publicado em <https://web.dalc.in/faunabr/> (cópia de `site/` para `S:\appsdata\web.dalc.in\faunabr`). Números: 4.154 grupos — 3.924 ativos, 83 em risco, 144 órfãos (3,5%), 3 agregadores; 6.047 espécies em grupos órfãos. |
 | 2026-10-13 | `dados/fauna.sqlite` | Limpeza: removidos os schemas auxiliares `carga`, `historico` (log de gatilhos, 26,4 M linhas), `postgrest` e `ipt_fauna` (19 tabelas). Ficaram as 78 tabelas de `public` + FTS5; 19,3 GB → 1,3 GB. Contagem das 78 tabelas idêntica ao backup; `integrity_check` ok; 98 FKs, 0 violações; `grafo.json` regenerado idêntico. Backup completo em `dados/fauna_backup_2026-10-13.sqlite`. `pg2sqlite.py` agora só converte `public`. `dados/modeloERctf.md` atualizado. |
 | 2026-10-13 | repositório | Arquivos separados do `faunabr` para este repositório; `README.md` com pipeline e publicação. |
+| 2026-10-14 | `scripts/exportar_completude.py` | Exportador SQLite → `site/completude/data/completude.json` (grupos, ~1 MB) e `valores.json` (Domínio de Valores global e por grupo, ~2,3 MB); ~10 s. Regras no mapa wayfinder "Completude de cada grupo da fauna brasileira". Números: 137.866 espécies aceitas, completude 57,3% (1.286.630 de 2.246.777 atributos), 21.734 sinônimos, 499 nomes não validados, 1 aceita sem grupo. |
+| 2026-10-14 | `site/completude/` | Página publicada (variante A do protótipo, reescrita): matriz grupos × 18 atributos, gaveta do grupo, Domínio de Valores global; `metodo.html`; cartão em `site/index.html`. `prototipo/` removido (fonte nos commits 322ff98 e a398082). |
 
 ## 2. Onde paramos
 
-Segunda análise, **"Completude de cada grupo da fauna brasileira"**, mapeada no wayfinder [Completude de cada grupo da fauna brasileira](https://github.com/edalcin/faunaAnalises/issues/1) (destino: página publicada, execução no mapa). Fechados: "Quanto está preenchido cada atributo de espécie, por domínio?", "O que é um Nome Validado?", "Que atributos compõem a completude de uma espécie?", "Como a completude de um grupo resume suas espécies?", "O que mostra o relatório por Domínio de Valores?" e "Como a página de completude deve parecer e se comportar?" (variante A, Matriz). Já existem `scripts/exportar_completude.py` (gera `site/completude/data/{completude,valores}.json`; completude global 57,3%) e o protótipo `site/completude/prototipo/?variante=A`. Fronteira: "Implementar e publicar a página de completude".
+Mapa wayfinder [Completude de cada grupo da fauna brasileira](https://github.com/edalcin/faunaAnalises/issues/1) (destino: página publicada, execução no mapa). Fechado agora: "Implementar e publicar a página de completude" — página no ar em <https://web.dalc.in/faunabr/completude/>. Fronteira: [Como a página mostra a completude de cada espécie?](https://github.com/edalcin/faunaAnalises/issues/9) (grilling; drill-down por espécie, que falta para o destino).
 
 ## 3. Pendências e ideias
 
