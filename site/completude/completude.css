@@ -3,7 +3,6 @@
 [data-theme="dark"] { --q1: #4f5136; --q2: #5f7a48; --q3: #4f9471; --q4: #5cb59a; --q5: #8fdcc6; --falta: #ec6577; }
 body { display: flex; flex-direction: column; min-height: 100vh; }
 .topo h1 { font-size: 1.25rem; margin: 0; flex: 1; text-align: center; }
-.topo .marca { font-size: .9rem; color: var(--muted); }
 .carregando { color: var(--muted); }
 @media (max-width: 760px) { .topo { flex-wrap: wrap; } .topo h1 { order: 3; width: 100%; text-align: left; } }
 

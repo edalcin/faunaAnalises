@@ -1,6 +1,5 @@
 body { display: flex; flex-direction: column; min-height: 100vh; }
 .topo h1 { font-size: 1.25rem; margin: 0; flex: 1; text-align: center; }
-.topo .marca { font-size: .9rem; color: var(--muted); }
 
 .abertura { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem 2rem; padding: .5rem 1.5rem; }
 .lead { margin: 0; max-width: 78ch; color: var(--muted); font-size: .9rem; }
