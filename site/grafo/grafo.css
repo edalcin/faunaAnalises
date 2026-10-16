@@ -101,7 +101,8 @@ tbody tr.contexto { color: var(--muted); }
 .faixa-tax .fim { text-anchor: end; }
 .faixa-tax .mediana { stroke: var(--muted); stroke-dasharray: 3 3; }
 .faixa-tax circle { fill: var(--pessoa); opacity: .45; cursor: pointer; }
-.faixa-tax circle.abr { fill: none; stroke: var(--pessoa); stroke-width: 1.5; opacity: .7; }
+:root { --abr: #8a4fa3; } [data-theme="dark"] { --abr: #c497d8; }
+.faixa-tax circle.abr { fill: var(--abr); }
 .faixa-tax circle:hover { opacity: 1; }
 .faixa-tax circle.eu { opacity: 1; fill: var(--orfao); r: 7; stroke: var(--fg); stroke-width: 1.5; }
 .faixa-tax .ini { text-anchor: start; fill: var(--fg); font-weight: 600; }
