@@ -91,3 +91,10 @@ tbody tr.contexto { color: var(--muted); }
 .nav-arvore button { font: inherit; font-size: .85rem; padding: .3rem .7rem; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); color: var(--fg); cursor: pointer; }
 .nav-arvore button:hover:not(:disabled) { border-color: var(--fg); }
 .nav-arvore button:disabled { opacity: .45; cursor: default; }
+.vista.taxonomistas { flex-direction: column; overflow: auto; padding: .8rem 1.5rem; }
+.taxonomistas table { max-width: 70rem; }
+.taxonomistas thead th { position: sticky; top: 0; background: var(--bg, var(--panel)); }
+.taxonomistas th button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+.taxonomistas th[aria-sort="ascending"] button::after { content: " ▲"; }
+.taxonomistas th[aria-sort="descending"] button::after { content: " ▼"; }
+.taxonomistas a { color: var(--pessoa); }

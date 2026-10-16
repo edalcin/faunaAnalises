@@ -36,6 +36,7 @@
 <nav class="abas" role="tablist" aria-label="Formas de ver">
   <button role="tab" id="aba-lista" aria-controls="vista-lista" aria-selected="true">Grupos e responsáveis</button>
   <button role="tab" id="aba-arvore" aria-controls="vista-arvore" aria-selected="false">Árvore dos grupos</button>
+  <button role="tab" id="aba-taxonomistas" aria-controls="vista-taxonomistas" aria-selected="false">Taxonomistas</button>
 </nav>
 <main>
   <section id="vista-lista" role="tabpanel" aria-labelledby="aba-lista" class="vista lista">
@@ -82,6 +83,19 @@
       <p>Animalia fica no centro e os filos ao redor. Cada círculo é um grupo; o tamanho mostra quantas espécies ele tem.
       Clique em um grupo para abrir os subgrupos. Entre colchetes está o número de órfãos escondidos abaixo de um grupo fechado.</p>
     </aside>
+  </section>
+  <section id="vista-taxonomistas" role="tabpanel" aria-labelledby="aba-taxonomistas" class="vista taxonomistas" hidden>
+    <p class="meta">Espécies dos grupos em que cada pessoa tem o vínculo; grupos aninhados contam uma vez. Clique no cabeçalho para ordenar.</p>
+    <table id="tabela-taxonomistas" aria-label="Taxonomistas e espécies por tipo de vínculo">
+      <thead><tr>
+        <th scope="col" data-col="nome"><button type="button">Taxonomista</button></th>
+        <th scope="col" class="num" data-col="COORDENADOR"><button type="button">Coordena</button></th>
+        <th scope="col" class="num" data-col="COLABORADOR"><button type="button">Colabora</button></th>
+        <th scope="col" class="num" data-col="SOMENTE_AUTORIA"><button type="button">Só autoria</button></th>
+        <th scope="col" class="num" data-col="total"><button type="button">Total</button></th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
   </section>
 </main>
 <footer class="rodape"></footer>

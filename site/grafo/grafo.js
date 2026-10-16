@@ -38,13 +38,15 @@ const estadosAbaixo = (id) => {
   while (pilha.length) { const x = pilha.pop(); if (G.get(x).estado in c) c[G.get(x).estado]++; pilha.push(...(filhos.get(x) ?? [])); }
   return c;
 };
-// espécies sob responsabilidade (Coordenação + Colaboração), sem contar duas vezes grupos aninhados
-const espPessoa = (uid) => {
-  const ids = new Set((vincU.get(uid) ?? []).filter((v) => v.perfil !== "SOMENTE_AUTORIA").map((v) => v.g));
+// espécies dos grupos vinculados (filtrados por perfil), sem contar duas vezes grupos aninhados
+const espGrupos = (uid, ok) => {
+  const ids = new Set((vincU.get(uid) ?? []).filter((v) => ok(v.perfil)).map((v) => v.g));
   let n = 0;
   for (const id of ids) { let p = G.get(id).pai; while (p != null && !ids.has(p)) p = G.get(p).pai; if (p == null) n += G.get(id).especies; }
   return n;
 };
+// sob responsabilidade = Coordenação + Colaboração
+const espPessoa = (uid) => espGrupos(uid, (p) => p !== "SOMENTE_AUTORIA");
 const destaqueEsp = (uid) => `<p class="esp-total"><b>${num(espPessoa(uid))}</b> espécies sob responsabilidade</p>`;
 
 // ---------- abertura ----------
@@ -382,7 +384,7 @@ function abrirArvore() {
 }
 
 // ---------- abas, tema e estado inicial ----------
-const abas = { "aba-lista": "vista-lista", "aba-arvore": "vista-arvore" };
+const abas = { "aba-lista": "vista-lista", "aba-arvore": "vista-arvore", "aba-taxonomistas": "vista-taxonomistas" };
 function mostrarAba(id) {
   for (const [a, v] of Object.entries(abas)) {
     document.getElementById(a).setAttribute("aria-selected", a === id);
@@ -393,9 +395,30 @@ function mostrarAba(id) {
 document.querySelector(".abas").addEventListener("click", (e) => e.target.id in abas && mostrarAba(e.target.id));
 document.querySelector(".abas").addEventListener("keydown", (e) => {
   if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
-  const outra = e.target.id === "aba-lista" ? "aba-arvore" : "aba-lista";
+  const ids = Object.keys(abas), outra = ids[(ids.indexOf(e.target.id) + (e.key === "ArrowRight" ? 1 : ids.length - 1)) % ids.length];
   mostrarAba(outra); document.getElementById(outra).focus();
 });
+
+// ---------- vista 3: tabela de taxonomistas ----------
+const LINHAS = [...vincU.keys()].filter((uid) => U.has(uid)).map((uid) => ({ uid, nome: U.get(uid).nome,
+  COORDENADOR: espGrupos(uid, (p) => p === "COORDENADOR"), COLABORADOR: espGrupos(uid, (p) => p === "COLABORADOR"),
+  SOMENTE_AUTORIA: espGrupos(uid, (p) => p === "SOMENTE_AUTORIA"), total: espGrupos(uid, () => true) }));
+const tabTax = document.getElementById("tabela-taxonomistas");
+let ordem = { col: "total", desc: true };
+function ordenarTax() {
+  const { col, desc } = ordem, s = desc ? -1 : 1;
+  LINHAS.sort((a, b) => s * (col === "nome" ? a.nome.localeCompare(b.nome, "pt-BR") : a[col] - b[col]) || a.nome.localeCompare(b.nome, "pt-BR"));
+  for (const th of tabTax.querySelectorAll("th[data-col]"))
+    th.setAttribute("aria-sort", th.dataset.col === col ? (desc ? "descending" : "ascending") : "none");
+  tabTax.tBodies[0].innerHTML = LINHAS.map((l) => `<tr><td><a href="?u=${l.uid}">${nomeU(l.uid)}</a></td>` +
+    ["COORDENADOR", "COLABORADOR", "SOMENTE_AUTORIA", "total"].map((k) => `<td class="num">${num(l[k])}</td>`).join("") + "</tr>").join("");
+}
+tabTax.tHead.addEventListener("click", (e) => {
+  const col = e.target.closest("th[data-col]")?.dataset.col; if (!col) return;
+  ordem = { col, desc: ordem.col === col ? !ordem.desc : col !== "nome" };
+  ordenarTax();
+});
+ordenarTax();
 addEventListener("tema", () => { cyF.style(estilo()); cyA?.style(estilo()); });
 controlesZoom(document.querySelector(".zoom[data-cy=foco]"), () => cyF);
 controlesZoom(document.querySelector(".zoom[data-cy=arvore]"), () => cyA);
