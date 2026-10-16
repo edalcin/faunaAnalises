@@ -31,7 +31,7 @@
 
 Mapa wayfinder [Completude de cada grupo da fauna brasileira](https://github.com/edalcin/faunaAnalises/issues/1) fechado: destino atingido em <https://web.dalc.in/faunabr/completude/>. Sem issues abertas. Próximo passo: escolher o tema da próxima análise e abrir novo mapa wayfinder.
 
-**Publicação:** copiar `site/` para `S:\appsdata\web.dalc.in\faunabr`. O HTML não fica em cache no Cloudflare; JS/CSS ficam 4 h (`max-age=14400`). Para o browser pegar a versão nova sem purgar o cache, trocar o `?v=<commit>` nos links de JS/CSS do `index.html` alterado (feito em `grafo/`). Commit/push **não** publica — a cópia é manual. Última publicação: `grafo/` em 2026-10-16 (commit `9e46192`: árvore colapsável, total de espécies do taxonomista, tooltip nos nós, coluna redimensionável).
+**Publicação:** copiar `site/` para `S:\appsdata\web.dalc.in\faunabr`. O HTML não fica em cache no Cloudflare; JS/CSS ficam 4 h (`max-age=14400`). Para o browser pegar a versão nova sem purgar o cache, trocar o `?v=<commit>` nos links de JS/CSS do `index.html` alterado (feito em `grafo/`). Commit/push **não** publica — a cópia é manual. Última publicação: `grafo/` em 2026-10-16 (commit `55c3981`: aba Taxonomistas — tabela ordenável com espécies por Coordenação, Colaboração, Só autoria e total distinto).
 
 ## 3. Pendências e ideias
 
