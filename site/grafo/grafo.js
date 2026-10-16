@@ -406,7 +406,7 @@ function abrirArvore() {
 }
 
 // ---------- abas, tema e estado inicial ----------
-const abas = { "aba-lista": "vista-lista", "aba-arvore": "vista-arvore", "aba-taxonomistas": "vista-taxonomistas" };
+const abas = { "aba-lista": "vista-lista", "aba-arvore": "vista-arvore", "aba-taxonomistas": "vista-taxonomistas", "aba-distribuicao": "vista-distribuicao" };
 function mostrarAba(id) {
   for (const [a, v] of Object.entries(abas)) {
     document.getElementById(a).setAttribute("aria-selected", a === id);
@@ -440,33 +440,61 @@ const LINHAS = [...vincU.keys()].filter((uid) => U.has(uid)).map((uid) => {
 const LUID = new Map(LINHAS.map((l) => [l.uid, l]));
 const coordenadores = LINHAS.filter((l) => l.direta > 0).sort((a, b) => b.direta - a.direta);
 const maxDireta = coordenadores[0]?.direta || 1;
-const mediana = coordenadores[coordenadores.length >> 1]?.direta ?? 0;
+
+// ---------- vista 4: distribuição (coordenação direta × abrangência) ----------
+// duas faixas de pontos (beeswarm), um ponto por coordenador em cada faixa, mesma escala log
+const dist = document.getElementById("dist-faixa"), distEu = document.getElementById("dist-eu");
+const porAbr = LINHAS.filter((l) => l.abr > 0).sort((a, b) => b.abr - a.abr);
+const med = (xs, k) => xs[xs.length >> 1]?.[k] ?? 0;
 { // quantas pessoas cobrem metade das espécies em coordenação direta
   const soma = coordenadores.reduce((s, l) => s + l.direta, 0); let acc = 0, n = 0;
   for (const l of coordenadores) { acc += l.direta; n++; if (acc >= soma / 2) break; }
-  document.getElementById("tax-lead").textContent = `${num(n)} pessoas fazem a coordenação direta de metade das espécies do catálogo. ` +
-    `Mediana: ${num(mediana)} espécies por coordenador (${num(coordenadores.length)} coordenadores).`;
+  document.getElementById("dist-lead").textContent = `${num(n)} pessoas fazem a coordenação direta de metade das espécies do catálogo. ` +
+    `Mediana: ${num(med(coordenadores, "direta"))} espécies em coordenação direta e ${num(med(porAbr, "abr"))} de abrangência por coordenador ` +
+    `(${num(coordenadores.length)} coordenadores).`;
 }
-
-// faixa de pontos: um ponto por coordenador, escala log
-const faixa = document.getElementById("tax-faixa"), W = 1000, X0 = 40, X1 = 970, Y = 50;
-const xLog = (v) => X0 + (X1 - X0) * Math.log10(Math.max(v, 1)) / Math.log10(maxDireta);
-{
-  const postos = []; // empilha pontos próximos para cima e para baixo (beeswarm simples)
-  const pontos = [...coordenadores].reverse().map((l) => {
-    const x = xLog(l.direta); let y = Y;
-    for (let k = 1; postos.some((p) => Math.abs(p.x - x) < 7 && Math.abs(p.y - y) < 7); k++) y = Y + (k % 2 ? 1 : -1) * Math.ceil(k / 2) * 7;
+const DW = 1000, DX0 = 40, DX1 = 970, DR = 4.5, PASSO = 9.5, maxEsp = Math.max(porAbr[0]?.abr ?? 1, maxDireta);
+const xLog = (v) => DX0 + (DX1 - DX0) * Math.log10(Math.max(v, 1)) / Math.log10(maxEsp);
+const posDist = { direta: new Map(), abr: new Map() }; // uid → {x, y}, para ligar a mesma pessoa nas duas faixas
+function faixaDist(k, xs, rotulo, Y0) {
+  const postos = [];
+  const pts = [...xs].reverse().map((l) => { // menores primeiro: os grandes ficam por cima
+    const x = xLog(l[k]); let y = 0;
+    for (let i = 1; postos.some((p) => Math.abs(p.x - x) < PASSO && Math.abs(p.y - y) < PASSO); i++) y = (i % 2 ? 1 : -1) * Math.ceil(i / 2) * PASSO;
     postos.push({ x, y });
-    return `<circle cx="${x.toFixed(1)}" cy="${y}" r="3.5" data-u="${l.uid}"><title>${esc(l.nome)}: ${num(l.direta)}</title></circle>`;
-  }).join("");
-  const ticks = [1, 10, 100, 1000, 10000].filter((t) => t <= maxDireta).map((t) =>
-    `<line x1="${xLog(t)}" x2="${xLog(t)}" y1="${Y + 26}" y2="${Y + 30}"/><text x="${xLog(t)}" y="${Y + 43}">${num(t)}</text>`).join("");
-  faixa.innerHTML = `<line class="eixo" x1="${X0}" x2="${X1}" y1="${Y + 26}" y2="${Y + 26}"/>${ticks}` +
-    `<line class="mediana" x1="${xLog(mediana)}" x2="${xLog(mediana)}" y1="${Y - 26}" y2="${Y + 26}"/>` +
-    `<text class="rot" x="${xLog(mediana)}" y="${Y - 30}">mediana</text><g class="pontos">${pontos}</g>` +
-    `<text class="rot fim" x="${X1}" y="${Y + 58}">espécies em coordenação direta (escala log)</text>`;
-  faixa.setAttribute("viewBox", `0 0 ${W} ${Y + 64}`);
+    return { l, x, y };
+  });
+  const alt = Math.max(...postos.map((p) => Math.abs(p.y))) + DR, Y = Y0 + alt + 22, md = med(xs, k);
+  for (const p of pts) posDist[k].set(p.l.uid, { x: p.x, y: Y + p.y });
+  const svg = `<text class="ini" x="${DX0}" y="${Y - alt - 8}">${rotulo}</text>` +
+    `<line class="mediana" x1="${xLog(md)}" x2="${xLog(md)}" y1="${Y - alt}" y2="${Y + alt}"/>` +
+    `<text x="${xLog(md)}" y="${Y - alt - 8}">mediana ${num(md)}</text>` +
+    pts.map(({ l, x, y }) => `<circle class="${k}" cx="${x.toFixed(1)}" cy="${Y + y}" r="${DR}" data-u="${l.uid}">` +
+      `<title>${esc(l.nome)}: ${num(l.direta)} em coordenação direta · ${num(l.abr)} de abrangência</title></circle>`).join("");
+  return { svg, fim: Y + alt + 10 };
 }
+{
+  const a = faixaDist("direta", coordenadores, "Coordenação direta", 0), b = faixaDist("abr", porAbr, "Abrangência", a.fim), y = b.fim;
+  const ticks = [1, 10, 100, 1000, 10000, 100000].filter((t) => t <= maxEsp).map((t) =>
+    `<line x1="${xLog(t)}" x2="${xLog(t)}" y1="${y}" y2="${y + 4}"/><text x="${xLog(t)}" y="${y + 17}">${num(t)}</text>`).join("");
+  dist.innerHTML = a.svg + b.svg + `<line class="liga" visibility="hidden"/><line class="eixo" x1="${DX0}" x2="${DX1}" y1="${y}" y2="${y}"/>${ticks}` +
+    `<text class="fim" x="${DX1}" y="${y + 34}">espécies (escala log)</text>`;
+  dist.setAttribute("viewBox", `0 0 ${DW} ${y + 40}`);
+}
+function marcarDist(uid) {
+  for (const c of dist.querySelectorAll("circle.eu")) c.classList.remove("eu");
+  for (const c of dist.querySelectorAll(`circle[data-u="${uid}"]`)) { c.classList.add("eu"); c.parentNode.append(c); } // traz para frente
+  const a = posDist.direta.get(uid), b = posDist.abr.get(uid), liga = dist.querySelector(".liga");
+  liga.setAttribute("visibility", a && b ? "visible" : "hidden");
+  if (a && b) { liga.setAttribute("x1", a.x); liga.setAttribute("y1", a.y); liga.setAttribute("x2", b.x); liga.setAttribute("y2", b.y); dist.append(liga); }
+  const l = LUID.get(uid);
+  distEu.innerHTML = `<b>${esc(l.nome)}</b>: ${num(l.direta)} espécies em coordenação direta, ${num(l.abr)} de abrangência` +
+    (l.abr ? ` (${Math.round(l.direta / l.abr * 100)}% da abrangência é coordenação direta).` : ". Não coordena grupos.") +
+    ` <button type="button" class="link" data-u="${uid}">Ver na tabela de taxonomistas</button>`;
+}
+dist.addEventListener("click", (e) => { const c = e.target.closest("circle[data-u]"); if (c) { marcarDist(+c.dataset.u); distAchar.value = ""; } });
+const distAchar = document.getElementById("dist-achar");
+distEu.addEventListener("click", (e) => { const b = e.target.closest("button[data-u]"); if (b) { mostrarAba("aba-taxonomistas"); selecionarTax(+b.dataset.u); } });
 
 const tabTax = document.getElementById("tabela-taxonomistas"), agrupar = document.getElementById("tax-agrupar");
 const achar = document.getElementById("tax-achar"), eu = document.getElementById("tax-eu");
@@ -504,9 +532,6 @@ function ordenarTax() {
 function selecionarTax(uid) {
   selecionado = uid; const l = LUID.get(uid);
   fechados.delete(l.classe); ordenarTax();
-  for (const c of faixa.querySelectorAll("circle.eu")) c.classList.remove("eu");
-  const ponto = faixa.querySelector(`circle[data-u="${uid}"]`);
-  if (ponto) { ponto.classList.add("eu"); ponto.parentNode.append(ponto); } // traz para frente
   const acima = coordenadores.filter((x) => x.direta < l.direta).length;
   eu.innerHTML = `<b>${esc(l.nome)}</b>: ${num(l.direta)} espécies em coordenação direta` +
     (l.abr ? `, ${num(l.abr)} de abrangência` : "") +
@@ -524,7 +549,7 @@ tabTax.tBodies[0].addEventListener("click", (e) => {
 });
 agrupar.addEventListener("change", ordenarTax);
 achar.addEventListener("input", () => ROTULO.has(achar.value) && selecionarTax(ROTULO.get(achar.value)));
-faixa.addEventListener("click", (e) => { const c = e.target.closest("circle[data-u]"); if (c) { selecionarTax(+c.dataset.u); achar.value = ""; } });
+distAchar.addEventListener("input", () => ROTULO.has(distAchar.value) && marcarDist(ROTULO.get(distAchar.value)));
 ordenarTax();
 addEventListener("tema", () => { cyF.style(estilo()); cyA?.style(estilo()); });
 controlesZoom(document.querySelector(".zoom[data-cy=foco]"), () => cyF);

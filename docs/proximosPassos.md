@@ -28,6 +28,7 @@
 | 2026-10-14 | `site/*.html` | Código de rastreamento Matomo (`matomo.dalc.in`, site 12) antes de `</head>` nas 5 páginas públicas. |
 | 2026-10-16 | `site/grafo/` | Lista em árvore colapsável, tooltip nos nós, coluna da lista redimensionável. |
 | 2026-10-16 | `site/grafo/` | Aba **Taxonomistas**: coordenação direta (espécies sem outro coordenador abaixo, divididas ÷N entre coordenadores; soma = catálogo), abrangência (todas as espécies dos grupos coordenados), grupos coordenados/colaborados, atividade (última edição como coordenador). Faixa de pontos (log) com mediana; "Encontre seu nome"; agrupamento por classe (ou filo) do grupo de maior coordenação direta; ordenação por coluna. Painel e tooltip da pessoa trocam "sob responsabilidade" por coordenação direta + abrangência. Só autoria fica só no painel. Números: 148 coordenadores, mediana 423 espécies, 15 pessoas cobrem metade. Nomes e visualização escolhidos com `judge()`. |
+| 2026-10-16 | `site/grafo/` | Aba **Distribuição da carga**: faixa de pontos saiu da aba Taxonomistas e virou duas faixas (coordenação direta cheia × abrangência vazada, mesma escala log, medianas 423 e 673); clique ou "Encontre seu nome" liga a pessoa nas duas faixas e leva à tabela; texto explicativo (medidas, leitura da linha, por que log/beeswarm). Opção escolhida (C2) por protótipo de 4 variantes. Ainda não publicado. |
 
 ## 2. Onde paramos
 

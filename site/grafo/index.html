@@ -37,6 +37,7 @@
   <button role="tab" id="aba-lista" aria-controls="vista-lista" aria-selected="true">Grupos e responsáveis</button>
   <button role="tab" id="aba-arvore" aria-controls="vista-arvore" aria-selected="false">Árvore dos grupos</button>
   <button role="tab" id="aba-taxonomistas" aria-controls="vista-taxonomistas" aria-selected="false">Taxonomistas</button>
+  <button role="tab" id="aba-distribuicao" aria-controls="vista-distribuicao" aria-selected="false">Distribuição da carga</button>
 </nav>
 <main>
   <section id="vista-lista" role="tabpanel" aria-labelledby="aba-lista" class="vista lista">
@@ -85,8 +86,6 @@
     </aside>
   </section>
   <section id="vista-taxonomistas" role="tabpanel" aria-labelledby="aba-taxonomistas" class="vista taxonomistas" hidden>
-    <p class="lead" id="tax-lead"></p>
-    <svg id="tax-faixa" class="faixa-tax" role="img" aria-label="Distribuição dos coordenadores por espécies em coordenação direta; os mesmos dados estão na tabela"></svg>
     <div class="tax-ferramentas">
       <label>Encontre seu nome <input type="search" id="tax-achar" list="tax-nomes" placeholder="Digite um nome" autocomplete="off"></label>
       <datalist id="tax-nomes"></datalist>
@@ -108,6 +107,50 @@
       </tr></thead>
       <tbody></tbody>
     </table>
+  </section>
+  <section id="vista-distribuicao" role="tabpanel" aria-labelledby="aba-distribuicao" class="vista distribuicao" hidden>
+    <p class="lead" id="dist-lead"></p>
+    <svg id="dist-faixa" class="faixa-tax" role="img" aria-label="Cada coordenador aparece duas vezes: na faixa de coordenação direta e na faixa de abrangência, na mesma escala log; os mesmos dados estão na aba Taxonomistas"></svg>
+    <div class="tax-ferramentas">
+      <label>Encontre seu nome <input type="search" id="dist-achar" list="tax-nomes" placeholder="Digite um nome" autocomplete="off"></label>
+      <span>Passe o mouse sobre um ponto para ver o nome. Clique para ligar a pessoa nas duas faixas.</span>
+    </div>
+    <p class="tax-eu" id="dist-eu" aria-live="polite"></p>
+    <div class="explica">
+      <h2>O que o gráfico mostra</h2>
+      <p>Cada ponto é uma pessoa que coordena pelo menos um grupo do catálogo. A posição na horizontal é o número de espécies.
+        Cada pessoa aparece duas vezes: uma vez na faixa de cima (<b>coordenação direta</b>) e uma vez na faixa de baixo (<b>abrangência</b>).
+        Quando muitas pessoas têm valores próximos, os pontos ficam empilhados. Assim, as partes altas da faixa mostram onde há mais pessoas.
+        A linha tracejada é a mediana: metade dos coordenadores está à esquerda dela, metade à direita.</p>
+      <h2>As duas medidas</h2>
+      <dl>
+        <dt>Coordenação direta (pontos cheios)</dt>
+        <dd>As espécies que ficam só com a pessoa: as espécies dos grupos que ela coordena, sem as dos subgrupos que têm coordenador próprio.
+          Se o grupo tem mais de um coordenador, as espécies são divididas entre eles. Cada espécie conta para uma pessoa só,
+          por isso a soma da faixa de cima é o catálogo inteiro. Esta medida mostra <b>a carga de trabalho</b>.</dd>
+        <dt>Abrangência (pontos vazados)</dt>
+        <dd>Todas as espécies dos grupos que a pessoa coordena, incluindo os subgrupos que têm outro coordenador.
+          Uma espécie conta para várias pessoas (quem coordena a ordem e quem coordena a família dentro dela), por isso a soma é maior que o catálogo.
+          Esta medida mostra <b>a responsabilidade</b>: até onde vai o grupo pelo qual a pessoa responde.</dd>
+      </dl>
+      <h2>Como ler a diferença</h2>
+      <p>A linha que liga os dois pontos de uma pessoa mostra a distância entre carga e responsabilidade.</p>
+      <ul>
+        <li><b>Linha vertical, ou quase</b>: os dois valores são iguais. A pessoa coordena sozinha todo o grupo, sem subgrupos com outro coordenador.</li>
+        <li><b>Linha inclinada para a direita</b>: a abrangência é maior que a carga direta. A pessoa coordena um grupo grande, mas outras pessoas cuidam de partes dele.
+          Quanto mais longa a linha, mais o grupo está dividido.</li>
+        <li><b>A faixa de baixo está deslocada para a direita</b>: isto é normal. A abrangência nunca é menor que a coordenação direta.
+          Os pontos acima de 10.000 na faixa de baixo são os coordenadores dos grupos grandes (por exemplo, uma classe inteira).</li>
+      </ul>
+      <h2>Por que este gráfico</h2>
+      <p>A carga do catálogo não está bem distribuída: poucas pessoas têm muitas espécies, e muitas pessoas têm poucas.
+        Uma barra por pessoa não mostra isso bem, porque os valores vão de menos de 10 a mais de 10.000.
+        A <b>escala log</b> dá o mesmo espaço a cada fator de 10 (de 10 a 100 e de 1.000 a 10.000). Assim, todas as pessoas ficam visíveis.
+        O gráfico de pontos mostra cada pessoa, e não só uma média. Com as duas faixas na mesma escala, é possível ver ao mesmo tempo
+        <b>quem carrega o trabalho</b> e <b>quem responde por grupos grandes</b>, e se é a mesma pessoa.</p>
+      <p class="meta">Só aparecem pessoas com pelo menos um grupo em coordenação. Quem só colabora ou só tem autoria não tem valor nas duas medidas;
+        estas pessoas estão na aba Taxonomistas.</p>
+    </div>
   </section>
 </main>
 <footer class="rodape"></footer>
