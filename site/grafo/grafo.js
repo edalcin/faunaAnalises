@@ -454,7 +454,9 @@ const ATV = { ativo: "Ativo: editou no último ano", risco: `${CA} a ${CR} anos 
   for (const l of coordenadores) { acc += l.direta; n++; if (acc >= soma / 2) break; }
   const por = Object.fromEntries(Object.keys(ATV).map((k) => [k, { n: 0, esp: 0 }]));
   for (const l of coordenadores) { por[atv(l)].n++; por[atv(l)].esp += l.direta; }
-  const pct = (x, t) => `${Math.round(x / t * 100)}%`;
+  const pct = (x, t) => `${Math.round(x / t * 100)}%`, medD = med(coordenadores, "direta");
+  const V = { n: coordenadores.length, medD, med10: medD * 10, metade: n, medA: med(porAbr, "abr") };
+  for (const s of document.querySelectorAll("#vista-distribuicao [data-v]")) s.textContent = num(V[s.dataset.v]);
   document.getElementById("dist-lead").textContent = `${num(n)} pessoas fazem a coordenação direta de metade das espécies do catálogo. ` +
     `Mediana: ${num(med(coordenadores, "direta"))} espécies em coordenação direta e ${num(med(porAbr, "abr"))} de abrangência por coordenador ` +
     `(${num(coordenadores.length)} coordenadores). ${num(por.orfao.n)} coordenadores (${pct(por.orfao.n, coordenadores.length)}) estão inativos, ` +
@@ -503,7 +505,7 @@ function marcarDist(uid) {
     (l.abr ? `<p><span class="estado ${atv(l)}">${ATV[atv(l)]}</span>${l.atividade ? ` <span class="meta">última edição em ${data(l.atividade)}</span>` : ""}</p>` : "") +
     (l.abr ? `<div class="dist-num"><p class="direta"><b>${num(l.direta)}</b>coordenação direta</p><p class="abr"><b>${num(l.abr)}</b>abrangência</p></div>` +
       `<p>${Math.round(l.direta / l.abr * 100)}% da abrangência é coordenação direta.` +
-      (l.direta ? ` Tem mais coordenação direta que ${Math.round(acima / coordenadores.length * 100)}% dos coordenadores.` : "") + `</p>`
+      (l.direta ? ` Tem mais coordenação direta que ${Math.round(acima / coordenadores.length * 100)}% dos coordenadores: está <b>${l.direta >= med(coordenadores, "direta") ? "à direita" : "à esquerda"} da mediana</b>.` : "") + `</p>`
       : `<p>Não coordena grupos.</p>`) +
     `<button type="button" class="botao" data-u="${uid}">Ver na tabela de taxonomistas →</button>`;
 }

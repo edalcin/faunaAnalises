@@ -110,22 +110,36 @@
   </section>
   <section id="vista-distribuicao" role="tabpanel" aria-labelledby="aba-distribuicao" class="vista distribuicao" hidden>
     <p class="lead" id="dist-lead"></p>
-    <svg id="dist-faixa" class="faixa-tax" role="img" aria-label="Cada coordenador aparece duas vezes: na faixa de coordenação direta e na faixa de abrangência, na mesma escala log; os mesmos dados estão na aba Taxonomistas"></svg>
-    <div class="tax-ferramentas">
-      <label>Encontre seu nome <input type="search" id="dist-achar" list="tax-nomes" placeholder="Digite um nome" autocomplete="off"></label>
-      <span>Passe o mouse sobre um ponto para ver o nome. Clique para ligar a pessoa nas duas faixas.</span>
+    <div class="dist-topo">
+      <svg id="dist-faixa" class="faixa-tax" role="img" aria-label="Cada coordenador aparece duas vezes: na faixa de coordenação direta e na faixa de abrangência, na mesma escala log; os mesmos dados estão na aba Taxonomistas"></svg>
+      <div class="dist-lado">
+        <label class="dist-busca">Encontre seu nome <input type="search" id="dist-achar" list="tax-nomes" placeholder="Digite um nome" autocomplete="off"></label>
+        <aside class="dist-pessoa" id="dist-eu" aria-live="polite">
+          <p class="meta">Passe o mouse sobre um ponto para ver o nome. Clique num ponto, ou busque um nome, para ver a pessoa aqui e ligar os seus dois pontos.</p>
+        </aside>
+      </div>
     </div>
     <div class="dist-legenda" id="dist-legenda" role="group" aria-label="Atividade dos coordenadores; clique para esconder ou mostrar"></div>
-    <div class="dist-corpo">
-    <aside class="dist-pessoa" id="dist-eu" aria-live="polite">
-      <p class="meta">Clique num ponto do gráfico ou busque um nome para ver a pessoa aqui.</p>
-    </aside>
     <div class="explica">
       <h2>O que o gráfico mostra</h2>
       <p>Cada ponto é uma pessoa que coordena pelo menos um grupo do catálogo. A posição na horizontal é o número de espécies.
         Cada pessoa aparece duas vezes: uma vez na faixa de cima (<b>coordenação direta</b>) e uma vez na faixa de baixo (<b>abrangência</b>).
         Quando muitas pessoas têm valores próximos, os pontos ficam empilhados. Assim, as partes altas da faixa mostram onde há mais pessoas.
-        A linha tracejada é a mediana: metade dos coordenadores está à esquerda dela, metade à direita.</p>
+        A linha tracejada é a mediana (veja abaixo).</p>
+      <h2>À esquerda ou à direita da mediana</h2>
+      <p>Ponha os <span data-v="n">148</span> coordenadores em fila, do que tem menos espécies ao que tem mais. A pessoa no meio da fila está na <b>mediana</b>.
+        Na faixa de cima, ela tem <span data-v="medD">423</span> espécies em coordenação direta. Assim:</p>
+      <ul>
+        <li><b>À esquerda da linha</b>: a pessoa tem menos espécies que o coordenador típico. Em geral, coordena um grupo pequeno, ou divide o grupo com outras pessoas.</li>
+        <li><b>À direita da linha</b>: a pessoa tem mais espécies que o coordenador típico. Quanto mais longe da linha, maior a carga.
+          Lembre-se que a escala é log: cada marca do eixo é 10 vezes a anterior. Um ponto em <span data-v="med10">4.230</span> tem 10 vezes a carga da mediana, não o dobro.</li>
+      </ul>
+      <p>Estar à direita não é melhor nem pior: é mais carga, e mais risco. Se uma pessoa muito à direita para de trabalhar,
+        muitas espécies ficam sem cuidado. Por isso, um <b>ponto vermelho à direita</b> é o caso que mais pede atenção.</p>
+      <p>Usamos a mediana, e não a média, porque poucas pessoas têm cargas muito grandes (<span data-v="metade">15</span> pessoas têm metade das espécies).
+        A média sobe com estas poucas pessoas e não mostra o coordenador típico. A mediana não muda com elas.
+        Na faixa de baixo, a mediana é maior (<span data-v="medA">673</span>) porque a abrangência conta também os subgrupos.
+        O cartão da pessoa diz de que lado da mediana ela está.</p>
       <h2>As cores: atividade</h2>
       <p>A posição mostra a carga; a cor mostra se a pessoa está de fato trabalhando no catálogo.
         A cor vem da <b>última edição da pessoa como coordenadora</b>, em qualquer grupo que ela coordena,
@@ -162,7 +176,6 @@
         <b>quem carrega o trabalho</b> e <b>quem responde por grupos grandes</b>, e se é a mesma pessoa.</p>
       <p class="meta">Só aparecem pessoas com pelo menos um grupo em coordenação. Quem só colabora ou só tem autoria não tem valor nas duas medidas;
         estas pessoas estão na aba Taxonomistas.</p>
-    </div>
     </div>
   </section>
 </main>
