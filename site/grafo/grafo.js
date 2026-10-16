@@ -446,12 +446,22 @@ const maxDireta = coordenadores[0]?.direta || 1;
 const dist = document.getElementById("dist-faixa"), distEu = document.getElementById("dist-eu");
 const porAbr = LINHAS.filter((l) => l.abr > 0).sort((a, b) => b.abr - a.abr);
 const med = (xs, k) => xs[xs.length >> 1]?.[k] ?? 0;
-{ // quantas pessoas cobrem metade das espécies em coordenação direta
+// atividade: última edição da pessoa como coordenadora (mesmos cortes dos grupos); sem data = sem edição registrada
+const atv = (l) => l.atividade ? estadoData(l.atividade) : "agregador";
+const ATV = { ativo: "Ativo: editou no último ano", risco: `${CA} a ${CR} anos sem editar`, orfao: `Inativo: mais de ${CR} anos sem editar`, agregador: "Sem edição registrada" };
+{ // quantas pessoas cobrem metade das espécies em coordenação direta; quanto está com coordenadores inativos
   const soma = coordenadores.reduce((s, l) => s + l.direta, 0); let acc = 0, n = 0;
   for (const l of coordenadores) { acc += l.direta; n++; if (acc >= soma / 2) break; }
+  const por = Object.fromEntries(Object.keys(ATV).map((k) => [k, { n: 0, esp: 0 }]));
+  for (const l of coordenadores) { por[atv(l)].n++; por[atv(l)].esp += l.direta; }
+  const pct = (x, t) => `${Math.round(x / t * 100)}%`;
   document.getElementById("dist-lead").textContent = `${num(n)} pessoas fazem a coordenação direta de metade das espécies do catálogo. ` +
     `Mediana: ${num(med(coordenadores, "direta"))} espécies em coordenação direta e ${num(med(porAbr, "abr"))} de abrangência por coordenador ` +
-    `(${num(coordenadores.length)} coordenadores).`;
+    `(${num(coordenadores.length)} coordenadores). ${num(por.orfao.n)} coordenadores (${pct(por.orfao.n, coordenadores.length)}) estão inativos, ` +
+    `sem editar há mais de ${CR} anos, e têm ${num(por.orfao.esp)} espécies (${pct(por.orfao.esp, soma)}) em coordenação direta.`;
+  document.getElementById("dist-legenda").innerHTML = Object.entries(ATV).filter(([k]) => por[k].n).map(([k, r]) =>
+    `<button type="button" data-k="${k}" aria-pressed="true" title="Clique para esconder ou mostrar"><i class="ponto ${k}"></i> ${r} ` +
+    `<span class="meta">${num(por[k].n)} pessoas · ${num(por[k].esp)} espécies diretas</span></button>`).join("");
 }
 const DW = 1000, DX0 = 40, DX1 = 970, DR = 4.5, PASSO = 9.5, maxEsp = Math.max(porAbr[0]?.abr ?? 1, maxDireta);
 const xLog = (v) => DX0 + (DX1 - DX0) * Math.log10(Math.max(v, 1)) / Math.log10(maxEsp);
@@ -469,8 +479,8 @@ function faixaDist(k, xs, rotulo, Y0) {
   const svg = `<text class="ini" x="${DX0}" y="${Y - alt - 8}">${rotulo}</text>` +
     `<line class="mediana" x1="${xLog(md)}" x2="${xLog(md)}" y1="${Y - alt}" y2="${Y + alt}"/>` +
     `<text x="${xLog(md)}" y="${Y - alt - 8}">mediana ${num(md)}</text>` +
-    pts.map(({ l, x, y }) => `<circle class="${k}" cx="${x.toFixed(1)}" cy="${Y + y}" r="${DR}" data-u="${l.uid}">` +
-      `<title>${esc(l.nome)}: ${num(l.direta)} em coordenação direta · ${num(l.abr)} de abrangência</title></circle>`).join("");
+    pts.map(({ l, x, y }) => `<circle class="${k} ${atv(l)}" cx="${x.toFixed(1)}" cy="${Y + y}" r="${DR}" data-u="${l.uid}">` +
+      `<title>${esc(l.nome)}: ${num(l.direta)} em coordenação direta · ${num(l.abr)} de abrangência · ${ATV[atv(l)]}</title></circle>`).join("");
   return { svg, fim: Y + alt + 10 };
 }
 {
@@ -490,6 +500,7 @@ function marcarDist(uid) {
   const l = LUID.get(uid), acima = coordenadores.filter((x) => x.direta < l.direta).length;
   distEu.innerHTML = `<h2 class="dist-nome">${esc(l.nome)}</h2>` +
     `<p class="meta">${esc(U.get(uid).instituicao ?? "Instituição não informada")} · ${esc(G.get(l.classe).nome)}</p>` +
+    (l.abr ? `<p><span class="estado ${atv(l)}">${ATV[atv(l)]}</span>${l.atividade ? ` <span class="meta">última edição em ${data(l.atividade)}</span>` : ""}</p>` : "") +
     (l.abr ? `<div class="dist-num"><p class="direta"><b>${num(l.direta)}</b>coordenação direta</p><p class="abr"><b>${num(l.abr)}</b>abrangência</p></div>` +
       `<p>${Math.round(l.direta / l.abr * 100)}% da abrangência é coordenação direta.` +
       (l.direta ? ` Tem mais coordenação direta que ${Math.round(acima / coordenadores.length * 100)}% dos coordenadores.` : "") + `</p>`
@@ -499,6 +510,10 @@ function marcarDist(uid) {
 dist.addEventListener("click", (e) => { const c = e.target.closest("circle[data-u]"); if (c) { marcarDist(+c.dataset.u); distAchar.value = ""; } });
 const distAchar = document.getElementById("dist-achar");
 distEu.addEventListener("click", (e) => { const b = e.target.closest("button[data-u]"); if (b) { mostrarAba("aba-taxonomistas"); selecionarTax(+b.dataset.u); } });
+document.getElementById("dist-legenda").addEventListener("click", (e) => {
+  const b = e.target.closest("button[data-k]"); if (!b) return;
+  b.setAttribute("aria-pressed", dist.classList.toggle("oculta-" + b.dataset.k) ? "false" : "true");
+});
 
 const tabTax = document.getElementById("tabela-taxonomistas"), agrupar = document.getElementById("tax-agrupar");
 const achar = document.getElementById("tax-achar"), eu = document.getElementById("tax-eu");

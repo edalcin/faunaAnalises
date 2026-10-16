@@ -100,13 +100,18 @@ tbody tr.contexto { color: var(--muted); }
 .faixa-tax text { fill: var(--muted); text-anchor: middle; }
 .faixa-tax .fim { text-anchor: end; }
 .faixa-tax .mediana { stroke: var(--muted); stroke-dasharray: 3 3; }
-.faixa-tax circle { fill: var(--pessoa); opacity: .45; cursor: pointer; }
-:root { --abr: #8a4fa3; } [data-theme="dark"] { --abr: #c497d8; }
-.faixa-tax circle.abr { fill: var(--abr); }
+.faixa-tax circle { fill: var(--pessoa); opacity: .7; cursor: pointer; }
+.faixa-tax circle.ativo { fill: var(--ativo); } .faixa-tax circle.risco { fill: var(--risco); }
+.faixa-tax circle.orfao { fill: var(--orfao); } .faixa-tax circle.agregador { fill: var(--agregador); }
+.faixa-tax.oculta-ativo circle.ativo:not(.eu), .faixa-tax.oculta-risco circle.risco:not(.eu),
+.faixa-tax.oculta-orfao circle.orfao:not(.eu), .faixa-tax.oculta-agregador circle.agregador:not(.eu) { opacity: .08; pointer-events: none; }
 .faixa-tax circle:hover { opacity: 1; }
-.faixa-tax circle.eu { opacity: 1; fill: var(--orfao); r: 7; stroke: var(--fg); stroke-width: 1.5; }
+.faixa-tax circle.eu { opacity: 1; r: 7; stroke: var(--fg); stroke-width: 2.5; }
 .faixa-tax .ini { text-anchor: start; fill: var(--fg); font-weight: 600; }
-.faixa-tax .liga { stroke: var(--orfao); stroke-width: 2; }
+.faixa-tax .liga { stroke: var(--fg); stroke-width: 2; }
+.dist-legenda { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .6rem; }
+.dist-legenda button { display: flex; align-items: center; gap: .4rem; font: inherit; font-size: .84rem; color: var(--fg); background: var(--panel); border: 1px solid var(--line); border-radius: 1rem; padding: .25rem .7rem; cursor: pointer; }
+.dist-legenda button[aria-pressed="false"] { opacity: .45; text-decoration: line-through; }
 .dist-corpo { display: grid; grid-template-columns: minmax(16rem, 1fr) 2fr; gap: 1.5rem 2.5rem; align-items: start; margin-top: 1rem; }
 @media (max-width: 760px) { .dist-corpo { grid-template-columns: 1fr; } }
 .dist-pessoa { position: sticky; top: 0; padding: 1rem 1.2rem; border: 1px solid var(--line); border-top: 4px solid var(--orfao); border-radius: 8px; background: var(--panel); font-size: .9rem; }
@@ -114,8 +119,7 @@ tbody tr.contexto { color: var(--muted); }
 .dist-nome { font-size: 1.35rem; margin: 0 0 .2rem; line-height: 1.2; }
 .dist-num { display: flex; gap: 1.5rem; margin: .8rem 0; }
 .dist-num p { margin: 0; color: var(--muted); font-size: .8rem; }
-.dist-num b { display: block; font-size: 1.6rem; line-height: 1.1; }
-.dist-num .direta b { color: var(--pessoa); } .dist-num .abr b { color: var(--abr); }
+.dist-num b { display: block; font-size: 1.6rem; line-height: 1.1; color: var(--fg); }
 .dist-pessoa .botao { margin-top: .6rem; font: inherit; color: var(--bg); background: var(--pessoa); border: 0; border-radius: 6px; padding: .45rem .8rem; cursor: pointer; }
 .dist-pessoa .botao:hover { filter: brightness(1.1); }
 .distribuicao .explica { font-size: .92rem; line-height: 1.5; }
