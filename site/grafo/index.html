@@ -46,17 +46,20 @@
           role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="sugestoes">
         <ul id="sugestoes" role="listbox" aria-label="Sugestões" hidden></ul>
       </div>
+      <div id="pessoas-busca"></div>
       <fieldset class="filtro" id="filtro-estado"><legend>Mostrar grupos</legend></fieldset>
       <p class="contagem" id="contagem" aria-live="polite"></p>
-      <table>
+      <table role="treegrid" aria-label="Grupos taxonômicos">
         <thead><tr><th scope="col">Grupo</th><th scope="col">Nível</th><th scope="col" class="num">Espécies</th></tr></thead>
         <tbody id="lista"></tbody>
       </table>
     </div>
+    <div class="divisor" role="separator" aria-orientation="vertical" aria-label="Largura da lista de grupos" tabindex="0"></div>
     <div class="coluna-foco">
       <fieldset class="filtro" id="filtro-perfil"><legend>Vínculos exibidos</legend></fieldset>
       <div class="palco">
         <div class="cy" id="cy-foco" role="img" aria-label="Grafo do grupo escolhido; o mesmo conteúdo está no painel ao lado"></div>
+        <div class="dica-no" role="tooltip" hidden></div>
         <div class="zoom" data-cy="foco"></div>
       </div>
     </div>
@@ -67,6 +70,7 @@
   <section id="vista-arvore" role="tabpanel" aria-labelledby="aba-arvore" class="vista arvore" hidden>
     <div class="palco">
       <div class="cy" id="cy-arvore" role="img" aria-label="Árvore radial dos grupos taxonômicos coloridos por estado"></div>
+      <div class="dica-no" role="tooltip" hidden></div>
       <div class="zoom" data-cy="arvore"></div>
       <div class="nav-arvore">
         <button type="button" id="arvore-voltar" disabled>← Voltar</button>

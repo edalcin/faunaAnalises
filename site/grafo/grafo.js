@@ -38,6 +38,14 @@ const estadosAbaixo = (id) => {
   while (pilha.length) { const x = pilha.pop(); if (G.get(x).estado in c) c[G.get(x).estado]++; pilha.push(...(filhos.get(x) ?? [])); }
   return c;
 };
+// espécies sob responsabilidade (Coordenação + Colaboração), sem contar duas vezes grupos aninhados
+const espPessoa = (uid) => {
+  const ids = new Set((vincU.get(uid) ?? []).filter((v) => v.perfil !== "SOMENTE_AUTORIA").map((v) => v.g));
+  let n = 0;
+  for (const id of ids) { let p = G.get(id).pai; while (p != null && !ids.has(p)) p = G.get(p).pai; if (p == null) n += G.get(id).especies; }
+  return n;
+};
+const destaqueEsp = (uid) => `<p class="esp-total"><b>${num(espPessoa(uid))}</b> espécies sob responsabilidade</p>`;
 
 // ---------- abertura ----------
 const total = D.grupos.reduce((c, g) => ((c[g.estado] = (c[g.estado] ?? 0) + 1), c), {});
@@ -79,7 +87,7 @@ function painelGrupo(el, g) {
 }
 function painelPessoa(el, uid) {
   const u = U.get(uid), vs = vincU.get(uid) ?? [];
-  el.innerHTML = `<h2>${esc(u.nome)}</h2><p class="meta">${esc(u.instituicao ?? "Instituição não informada")}</p>` +
+  el.innerHTML = `<h2>${esc(u.nome)}</h2>${destaqueEsp(uid)}<p class="meta">${esc(u.instituicao ?? "Instituição não informada")}</p>` +
     Object.keys(PERFIL).map((p) => {
       const l = vs.filter((v) => v.perfil === p).map((v) => { const g = G.get(v.g);
         return `<li><button class="link" data-g="${g.id}">${esc(g.nome)}</button> <span class="estado ${g.estado}">${ESTADO[g.estado]}</span></li>`; }).join("");
@@ -117,20 +125,42 @@ const lista = document.getElementById("lista"), painel = document.getElementById
 const cyF = cytoscape(cytoOpts("cy-foco"));
 let focoAtual = null;
 
+// lista em árvore colapsável (como em completude/): grupos que passam no filtro + seus ancestrais como contexto
+const expandidos = new Set();
 function listar() {
   const t = busca.value.trim().toLocaleLowerCase("pt-BR");
   const estados = new Set([...filtroEstado.querySelectorAll("input:checked")].map((i) => i.value));
   let gs;
+  const pessoas = t ? D.usuarios.filter((u) => u.nome.toLocaleLowerCase("pt-BR").includes(t)) : [];
   if (t) {
     const s = new Set(D.grupos.filter((g) => g.nome.toLocaleLowerCase("pt-BR").includes(t)));
-    for (const u of D.usuarios) if (u.nome.toLocaleLowerCase("pt-BR").includes(t)) for (const v of vincU.get(u.id) ?? []) s.add(G.get(v.g));
+    for (const u of pessoas) for (const v of vincU.get(u.id) ?? []) s.add(G.get(v.g));
     gs = [...s];
   } else gs = D.grupos.filter((g) => estados.has(g.estado));
-  gs.sort((a, b) => b.especies - a.especies);
-  document.getElementById("contagem").textContent = `${num(gs.length)} grupos${t ? ` para “${busca.value.trim()}”` : ""}${gs.length > 400 ? "; mostrando os 400 maiores" : ""}.`;
-  lista.innerHTML = gs.slice(0, 400).map((g) => `<tr tabindex="0" data-g="${g.id}" ${g.id === focoAtual ? 'aria-current="true"' : ""}>
-    <td><span class="ponto" style="background:var(--${g.estado})"></span>${esc(g.nome)}<span class="sr"> (${ESTADO[g.estado]})</span></td>
+  document.getElementById("pessoas-busca").innerHTML = pessoas.length && pessoas.length <= 3 ? pessoas.map((u) =>
+    `<div class="pessoa-busca"><b>${esc(u.nome)}</b>${destaqueEsp(u.id)}</div>`).join("") : "";
+  const achados = new Set(gs.map((g) => g.id)), visiveis = new Set(achados);
+  for (const g of gs) for (let p = g.pai; p != null && !visiveis.has(p); p = G.get(p).pai) visiveis.add(p);
+  const aberto = (id) => t || expandidos.has(id); // com busca, tudo aberto até os achados
+  const linhas = [];
+  const desce = (ids, n) => {
+    for (const id of ids.filter((x) => visiveis.has(x)).sort((a, b) => G.get(b).especies - G.get(a).especies)) {
+      const kids = (filhos.get(id) ?? []).filter((x) => visiveis.has(x));
+      linhas.push({ g: G.get(id), n, kids: kids.length });
+      if (kids.length && aberto(id)) desce(kids, n + 1);
+    }
+  };
+  desce(D.grupos.filter((g) => g.pai == null).map((g) => g.id), 0);
+  document.getElementById("contagem").textContent = `${num(gs.length)} grupos${t ? ` para “${busca.value.trim()}”` : ""}.`;
+  // ponytail: render único; 4.154 linhas no pior caso ainda cabem no DOM
+  lista.innerHTML = linhas.map(({ g, n, kids }) => `<tr tabindex="0" data-g="${g.id}" aria-level="${n + 1}"${kids ? ` aria-expanded="${!!aberto(g.id)}"` : ""}${achados.has(g.id) ? "" : ' class="contexto"'} ${g.id === focoAtual ? 'aria-current="true"' : ""}>
+    <td style="padding-left:${0.3 + n * 0.9}rem"><span class="seta">${kids && !t ? (aberto(g.id) ? "▾" : "▸") : ""}</span><span class="ponto" style="background:var(--${g.estado})"></span>${esc(g.nome)}<span class="sr"> (${ESTADO[g.estado]})</span></td>
     <td>${RANK[g.rank] ?? ""}</td><td class="num">${num(g.especies)}</td></tr>`).join("");
+}
+function alternar(id, abrir = !expandidos.has(id)) {
+  abrir ? expandidos.add(id) : expandidos.delete(id);
+  listar();
+  lista.querySelector(`tr[data-g="${id}"]`)?.focus({ preventScroll: true });
 }
 
 function focar(id, { rolar = false } = {}) {
@@ -155,7 +185,8 @@ function focar(id, { rolar = false } = {}) {
   enquadrar(cyF);
   painelGrupo(painel, g);
   lista.querySelectorAll("tr[aria-current]").forEach((tr) => tr.removeAttribute("aria-current"));
-  const tr = lista.querySelector(`tr[data-g="${id}"]`);
+  let tr = lista.querySelector(`tr[data-g="${id}"]`);
+  if (!tr && !busca.value.trim()) { for (let p = g.pai; p != null; p = G.get(p).pai) expandidos.add(p); listar(); tr = lista.querySelector(`tr[data-g="${id}"]`); }
   tr?.setAttribute("aria-current", "true"); if (rolar) tr?.scrollIntoView({ block: "nearest" });
   const url = new URL(location); url.searchParams.delete("u"); url.searchParams.set("g", id); history.replaceState(null, "", url);
 }
@@ -223,17 +254,55 @@ filtroPerfil.addEventListener("change", () => {
   const u = new URL(location).searchParams.get("u");
   u ? focarPessoa(+u) : focoAtual != null && focar(focoAtual);
 });
-const escolher = (e) => { const tr = e.target.closest("tr[data-g]"); if (tr) focar(+tr.dataset.g); };
-lista.addEventListener("click", escolher);
+lista.addEventListener("click", (e) => {
+  const tr = e.target.closest("tr[data-g]"); if (!tr) return;
+  e.target.closest(".seta") && tr.hasAttribute("aria-expanded") && !busca.value.trim() ? alternar(+tr.dataset.g) : focar(+tr.dataset.g);
+});
 lista.addEventListener("keydown", (e) => {
-  if (e.key === "Enter" || e.key === " ") { e.preventDefault(); escolher(e); }
-  if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); (e.key === "ArrowDown" ? e.target.nextElementSibling : e.target.previousElementSibling)?.focus(); }
+  const tr = e.target.closest("tr[data-g]"); if (!tr) return;
+  const id = +tr.dataset.g, livre = !busca.value.trim();
+  if (e.key === "Enter" || e.key === " ") { e.preventDefault(); focar(id); }
+  if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); (e.key === "ArrowDown" ? tr.nextElementSibling : tr.previousElementSibling)?.focus(); }
+  if (e.key === "ArrowRight" && livre && tr.hasAttribute("aria-expanded")) { e.preventDefault(); expandidos.has(id) ? tr.nextElementSibling?.focus() : alternar(id, true); }
+  if (e.key === "ArrowLeft" && livre) {
+    e.preventDefault();
+    if (expandidos.has(id)) alternar(id, false);
+    else lista.querySelector(`tr[data-g="${G.get(id).pai}"]`)?.focus();
+  }
 });
 painel.addEventListener("click", (e) => {
   const b = e.target.closest("button.link"); if (!b) return;
   b.dataset.g ? focar(+b.dataset.g, { rolar: true }) : focarPessoa(+b.dataset.u);
 });
 cyF.on("tap", "node", (e) => e.target.data("kind") === "pessoa" ? focarPessoa(e.target.data("uid")) : focar(e.target.data("gid"), { rolar: true }));
+// número de espécies ao passar o mouse sobre um nó
+function dicaNos(cy, dica) {
+  cy.on("mouseover", "node", (e) => {
+    const d = e.target.data(), p = e.target.renderedPosition();
+    if (d.kind === "pessoa") dica.innerHTML = `<b>${esc(U.get(d.uid).nome)}</b><br>${num(espPessoa(d.uid))} espécies sob responsabilidade`;
+    else { const g = G.get(d.gid); dica.innerHTML = `<b>${esc(g.nome)}</b><br>${num(g.especies)} espécies` + (g.especies_diretas != null ? ` (${num(g.especies_diretas)} diretas)` : ""); }
+    dica.hidden = false;
+    dica.style.left = p.x + 12 + "px"; dica.style.top = p.y + 12 + "px";
+  });
+  cy.on("mouseout", "node", () => (dica.hidden = true));
+  cy.on("viewport tap", () => (dica.hidden = true));
+}
+dicaNos(cyF, document.querySelector("#cy-foco + .dica-no"));
+
+// largura da coluna da lista: arrastar o divisor (ou setas no teclado); guardada no navegador
+const colLista = document.querySelector(".coluna-lista"), divisor = document.querySelector(".divisor");
+const largura = (px) => { px = Math.max(240, Math.min(innerWidth * 0.6, px)); colLista.style.width = px + "px"; cyF.resize(); localStorage.setItem("grafo-largura-lista", Math.round(px)); };
+if (localStorage.getItem("grafo-largura-lista")) largura(+localStorage.getItem("grafo-largura-lista"));
+divisor.addEventListener("pointerdown", (e) => {
+  const x0 = e.clientX, w0 = colLista.offsetWidth;
+  divisor.setPointerCapture(e.pointerId); divisor.classList.add("arrastando");
+  const mover = (ev) => largura(w0 + ev.clientX - x0);
+  divisor.addEventListener("pointermove", mover);
+  divisor.addEventListener("pointerup", () => { divisor.removeEventListener("pointermove", mover); divisor.classList.remove("arrastando"); }, { once: true });
+});
+divisor.addEventListener("keydown", (e) => {
+  if (e.key === "ArrowLeft" || e.key === "ArrowRight") { e.preventDefault(); largura(colLista.offsetWidth + (e.key === "ArrowRight" ? 24 : -24)); }
+});
 
 // enquadra tudo, sem ampliar demais grafos pequenos
 function enquadrar(cy) {
@@ -301,6 +370,7 @@ btRaiz.addEventListener("click", () => navegar([0], painelArvoreId));
 function abrirArvore() {
   if (cyA) return;
   cyA = cytoscape(cytoOpts("cy-arvore"));
+  dicaNos(cyA, document.querySelector("#cy-arvore + .dica-no"));
   cyA.on("tap", "node", (e) => {
     const id = e.target.data("gid");
     if (!id) return;
