@@ -45,9 +45,31 @@ const espGrupos = (uid, ok) => {
   for (const id of ids) { let p = G.get(id).pai; while (p != null && !ids.has(p)) p = G.get(p).pai; if (p == null) n += G.get(id).especies; }
   return n;
 };
-// sob responsabilidade = Coordenação + Colaboração
-const espPessoa = (uid) => espGrupos(uid, (p) => p !== "SOMENTE_AUTORIA");
-const destaqueEsp = (uid) => `<p class="esp-total"><b>${num(espPessoa(uid))}</b> espécies sob responsabilidade</p>`;
+// coordenação direta: as espécies diretas de cada grupo vão aos coordenadores do grupo coordenado mais próximo
+// (o próprio grupo ou um ancestral), divididas igualmente se houver mais de um. Soma de todos = catálogo.
+const coordDe = new Map(), direta = new Map(), diretaPorGrupo = new Map();
+for (const v of D.vinculos) if (v.perfil === "COORDENADOR") juntar(coordDe, v.g, v.u);
+for (const g of D.grupos) {
+  let x = g.id; while (x != null && !coordDe.has(x)) x = G.get(x).pai;
+  if (x == null || !g.especies_diretas) continue;
+  const us = coordDe.get(x), n = g.especies_diretas / us.length;
+  for (const u of us) {
+    direta.set(u, (direta.get(u) ?? 0) + n);
+    const m = diretaPorGrupo.get(u) ?? diretaPorGrupo.set(u, new Map()).get(u);
+    m.set(x, (m.get(x) ?? 0) + n);
+  }
+}
+const espDireta = (uid) => Math.round(direta.get(uid) ?? 0);
+// abrangência: todas as espécies dos grupos que a pessoa coordena, incluindo subgrupos com coordenador próprio
+const abrangencia = (uid) => espGrupos(uid, (p) => p === "COORDENADOR");
+const miniBarra = (d, a) => `<span class="mini" title="${num(d)} de ${num(a)} espécies"><i style="width:${a ? Math.min(100, d / a * 100) : 0}%"></i></span>`;
+const destaqueEsp = (uid) => {
+  const a = abrangencia(uid), d = espDireta(uid);
+  if (!a) return `<p class="esp-total">Não coordena grupos</p>`;
+  return `<p class="esp-total"><b>${num(d)}</b> espécies em coordenação direta</p>` +
+    `<p class="abr-linha">${miniBarra(d, a)} abrangência: ${num(a)} espécies nos grupos que coordena</p>`;
+};
+const dicaPessoa = (uid) => abrangencia(uid) ? `${num(espDireta(uid))} em coordenação direta · ${num(abrangencia(uid))} de abrangência` : "não coordena grupos";
 
 // ---------- abertura ----------
 const total = D.grupos.reduce((c, g) => ((c[g.estado] = (c[g.estado] ?? 0) + 1), c), {});
@@ -281,7 +303,7 @@ cyF.on("tap", "node", (e) => e.target.data("kind") === "pessoa" ? focarPessoa(e.
 function dicaNos(cy, dica) {
   cy.on("mouseover", "node", (e) => {
     const d = e.target.data(), p = e.target.renderedPosition();
-    if (d.kind === "pessoa") dica.innerHTML = `<b>${esc(U.get(d.uid).nome)}</b><br>${num(espPessoa(d.uid))} espécies sob responsabilidade`;
+    if (d.kind === "pessoa") dica.innerHTML = `<b>${esc(U.get(d.uid).nome)}</b><br>${dicaPessoa(d.uid)}`;
     else { const g = G.get(d.gid); dica.innerHTML = `<b>${esc(g.nome)}</b><br>${num(g.especies)} espécies` + (g.especies_diretas != null ? ` (${num(g.especies_diretas)} diretas)` : ""); }
     dica.hidden = false;
     dica.style.left = p.x + 12 + "px"; dica.style.top = p.y + 12 + "px";
@@ -399,25 +421,110 @@ document.querySelector(".abas").addEventListener("keydown", (e) => {
   mostrarAba(outra); document.getElementById(outra).focus();
 });
 
-// ---------- vista 3: tabela de taxonomistas ----------
-const LINHAS = [...vincU.keys()].filter((uid) => U.has(uid)).map((uid) => ({ uid, nome: U.get(uid).nome,
-  COORDENADOR: espGrupos(uid, (p) => p === "COORDENADOR"), COLABORADOR: espGrupos(uid, (p) => p === "COLABORADOR"),
-  SOMENTE_AUTORIA: espGrupos(uid, (p) => p === "SOMENTE_AUTORIA"), total: espGrupos(uid, () => true) }));
-const tabTax = document.getElementById("tabela-taxonomistas");
-let ordem = { col: "total", desc: true };
-function ordenarTax() {
+// ---------- vista 3: taxonomistas ----------
+// grupo de exibição: classe (ou filo, acima de classe) do grupo onde a pessoa tem mais coordenação direta;
+// sem coordenação, o maior grupo com qualquer vínculo
+const classeDe = (gid) => { let g = G.get(gid); while (g.rank !== "CLASSE" && g.pai != null) g = G.get(g.pai); return g.id; };
+const hoje = new Date(D.referencia);
+const estadoData = (d) => { const anos = (hoje - new Date(d)) / 3.15576e10; return anos < CA ? "ativo" : anos < CR ? "risco" : "orfao"; };
+const LINHAS = [...vincU.keys()].filter((uid) => U.has(uid)).map((uid) => {
+  const vs = vincU.get(uid), coord = vs.filter((v) => v.perfil === "COORDENADOR");
+  const porG = [...(diretaPorGrupo.get(uid) ?? [])].sort((a, b) => b[1] - a[1]);
+  const principal = porG[0]?.[0] ?? vs.reduce((m, v) => G.get(v.g).especies > G.get(m).especies ? v.g : m, vs[0].g);
+  const datas = coord.map((v) => v.ultima_edicao).filter(Boolean).sort();
+  return { uid, nome: U.get(uid).nome, direta: espDireta(uid), abr: abrangencia(uid),
+    nCoord: coord.length, nColab: vs.filter((v) => v.perfil === "COLABORADOR").length,
+    divisao: Math.max(1, ...porG.map(([g]) => coordDe.get(g).length)), atividade: datas.at(-1) ?? "",
+    classe: classeDe(principal) };
+});
+const LUID = new Map(LINHAS.map((l) => [l.uid, l]));
+const coordenadores = LINHAS.filter((l) => l.direta > 0).sort((a, b) => b.direta - a.direta);
+const maxDireta = coordenadores[0]?.direta || 1;
+const mediana = coordenadores[coordenadores.length >> 1]?.direta ?? 0;
+{ // quantas pessoas cobrem metade das espécies em coordenação direta
+  const soma = coordenadores.reduce((s, l) => s + l.direta, 0); let acc = 0, n = 0;
+  for (const l of coordenadores) { acc += l.direta; n++; if (acc >= soma / 2) break; }
+  document.getElementById("tax-lead").textContent = `${num(n)} pessoas fazem a coordenação direta de metade das espécies do catálogo. ` +
+    `Mediana: ${num(mediana)} espécies por coordenador (${num(coordenadores.length)} coordenadores).`;
+}
+
+// faixa de pontos: um ponto por coordenador, escala log
+const faixa = document.getElementById("tax-faixa"), W = 1000, X0 = 40, X1 = 970, Y = 50;
+const xLog = (v) => X0 + (X1 - X0) * Math.log10(Math.max(v, 1)) / Math.log10(maxDireta);
+{
+  const postos = []; // empilha pontos próximos para cima e para baixo (beeswarm simples)
+  const pontos = [...coordenadores].reverse().map((l) => {
+    const x = xLog(l.direta); let y = Y;
+    for (let k = 1; postos.some((p) => Math.abs(p.x - x) < 7 && Math.abs(p.y - y) < 7); k++) y = Y + (k % 2 ? 1 : -1) * Math.ceil(k / 2) * 7;
+    postos.push({ x, y });
+    return `<circle cx="${x.toFixed(1)}" cy="${y}" r="3.5" data-u="${l.uid}"><title>${esc(l.nome)}: ${num(l.direta)}</title></circle>`;
+  }).join("");
+  const ticks = [1, 10, 100, 1000, 10000].filter((t) => t <= maxDireta).map((t) =>
+    `<line x1="${xLog(t)}" x2="${xLog(t)}" y1="${Y + 26}" y2="${Y + 30}"/><text x="${xLog(t)}" y="${Y + 43}">${num(t)}</text>`).join("");
+  faixa.innerHTML = `<line class="eixo" x1="${X0}" x2="${X1}" y1="${Y + 26}" y2="${Y + 26}"/>${ticks}` +
+    `<line class="mediana" x1="${xLog(mediana)}" x2="${xLog(mediana)}" y1="${Y - 26}" y2="${Y + 26}"/>` +
+    `<text class="rot" x="${xLog(mediana)}" y="${Y - 30}">mediana</text><g class="pontos">${pontos}</g>` +
+    `<text class="rot fim" x="${X1}" y="${Y + 58}">espécies em coordenação direta (escala log)</text>`;
+  faixa.setAttribute("viewBox", `0 0 ${W} ${Y + 64}`);
+}
+
+const tabTax = document.getElementById("tabela-taxonomistas"), agrupar = document.getElementById("tax-agrupar");
+const achar = document.getElementById("tax-achar"), eu = document.getElementById("tax-eu");
+const ROTULO = new Map(LINHAS.map((l) => [l.nome + (U.get(l.uid).instituicao ? ` (${U.get(l.uid).instituicao})` : ""), l.uid]));
+document.getElementById("tax-nomes").innerHTML = [...ROTULO.keys()].map((n) => `<option value="${esc(n)}">`).join("");
+let ordem = { col: "direta", desc: true }, selecionado = null;
+const fechados = new Set();
+const cmp = (a, b) => {
   const { col, desc } = ordem, s = desc ? -1 : 1;
-  LINHAS.sort((a, b) => s * (col === "nome" ? a.nome.localeCompare(b.nome, "pt-BR") : a[col] - b[col]) || a.nome.localeCompare(b.nome, "pt-BR"));
+  const r = col === "nome" || col === "atividade" ? a[col].localeCompare(b[col], "pt-BR") : a[col] - b[col];
+  return s * r || a.nome.localeCompare(b.nome, "pt-BR");
+};
+const linhaTax = (l) => `<tr data-u="${l.uid}"${l.uid === selecionado ? ' aria-current="true"' : ""}>` +
+  `<td><a href="?u=${l.uid}">${nomeU(l.uid)}</a></td>` +
+  `<td class="barra-cel">${l.direta ? `<span class="barra"><i style="width:${l.direta / maxDireta * 100}%"></i></span>` : ""}` +
+  `<span class="num">${num(l.direta)}</span>${l.divisao > 1 ? ` <span class="div" title="coordenação dividida entre ${l.divisao} pessoas">÷${l.divisao}</span>` : ""}</td>` +
+  `<td>${l.abr ? `${miniBarra(l.direta, l.abr)} <span class="meta">${num(l.direta)} / ${num(l.abr)}</span>` : ""}</td>` +
+  `<td class="num">${num(l.nCoord)}</td><td class="num">${num(l.nColab)}</td>` +
+  `<td>${l.atividade ? `<i class="ponto ${estadoData(l.atividade)}" title="${ESTADO[estadoData(l.atividade)]}"></i> ${data(l.atividade)}` : '<span class="meta">—</span>'}</td></tr>`;
+function ordenarTax() {
   for (const th of tabTax.querySelectorAll("th[data-col]"))
-    th.setAttribute("aria-sort", th.dataset.col === col ? (desc ? "descending" : "ascending") : "none");
-  tabTax.tBodies[0].innerHTML = LINHAS.map((l) => `<tr><td><a href="?u=${l.uid}">${nomeU(l.uid)}</a></td>` +
-    ["COORDENADOR", "COLABORADOR", "SOMENTE_AUTORIA", "total"].map((k) => `<td class="num">${num(l[k])}</td>`).join("") + "</tr>").join("");
+    th.setAttribute("aria-sort", th.dataset.col === ordem.col ? (ordem.desc ? "descending" : "ascending") : "none");
+  const ls = [...LINHAS].sort(cmp);
+  if (agrupar.value !== "classe") { tabTax.tBodies[0].innerHTML = ls.map(linhaTax).join(""); return; }
+  const grupos = new Map();
+  for (const l of ls) juntar(grupos, l.classe, l);
+  const soma = (xs) => xs.reduce((s, l) => s + l.direta, 0);
+  tabTax.tBodies[0].innerHTML = [...grupos].sort((a, b) => soma(b[1]) - soma(a[1])).map(([c, xs]) => {
+    const aberto = !fechados.has(c);
+    return `<tr class="grupo-tax"><th colspan="6" scope="rowgroup"><button type="button" data-c="${c}" aria-expanded="${aberto}">` +
+      `${aberto ? "▾" : "▸"} ${esc(G.get(c).nome)}</button> <span class="meta">${num(xs.length)} pessoas, ${num(xs.filter((l) => l.direta).length)} com coordenação direta</span></th></tr>` +
+      (aberto ? xs.map(linhaTax).join("") : "");
+  }).join("");
+}
+function selecionarTax(uid) {
+  selecionado = uid; const l = LUID.get(uid);
+  fechados.delete(l.classe); ordenarTax();
+  for (const c of faixa.querySelectorAll("circle.eu")) c.classList.remove("eu");
+  const ponto = faixa.querySelector(`circle[data-u="${uid}"]`);
+  if (ponto) { ponto.classList.add("eu"); ponto.parentNode.append(ponto); } // traz para frente
+  const acima = coordenadores.filter((x) => x.direta < l.direta).length;
+  eu.innerHTML = `<b>${esc(l.nome)}</b>: ${num(l.direta)} espécies em coordenação direta` +
+    (l.abr ? `, ${num(l.abr)} de abrangência` : "") +
+    (l.direta ? (acima ? `. Tem mais que ${Math.round(acima / coordenadores.length * 100)}% dos coordenadores.` : ".") : ". Não tem coordenação direta.");
+  tabTax.querySelector(`tr[data-u="${uid}"]`)?.scrollIntoView({ block: "center" });
 }
 tabTax.tHead.addEventListener("click", (e) => {
   const col = e.target.closest("th[data-col]")?.dataset.col; if (!col) return;
   ordem = { col, desc: ordem.col === col ? !ordem.desc : col !== "nome" };
   ordenarTax();
 });
+tabTax.tBodies[0].addEventListener("click", (e) => {
+  const b = e.target.closest("button[data-c]"); if (!b) return;
+  const c = +b.dataset.c; fechados.has(c) ? fechados.delete(c) : fechados.add(c); ordenarTax();
+});
+agrupar.addEventListener("change", ordenarTax);
+achar.addEventListener("input", () => ROTULO.has(achar.value) && selecionarTax(ROTULO.get(achar.value)));
+faixa.addEventListener("click", (e) => { const c = e.target.closest("circle[data-u]"); if (c) { selecionarTax(+c.dataset.u); achar.value = ""; } });
 ordenarTax();
 addEventListener("tema", () => { cyF.style(estilo()); cyA?.style(estilo()); });
 controlesZoom(document.querySelector(".zoom[data-cy=foco]"), () => cyF);

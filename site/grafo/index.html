@@ -85,14 +85,26 @@
     </aside>
   </section>
   <section id="vista-taxonomistas" role="tabpanel" aria-labelledby="aba-taxonomistas" class="vista taxonomistas" hidden>
-    <p class="meta">Espécies dos grupos em que cada pessoa tem o vínculo; grupos aninhados contam uma vez. Clique no cabeçalho para ordenar.</p>
-    <table id="tabela-taxonomistas" aria-label="Taxonomistas e espécies por tipo de vínculo">
+    <p class="lead" id="tax-lead"></p>
+    <svg id="tax-faixa" class="faixa-tax" role="img" aria-label="Distribuição dos coordenadores por espécies em coordenação direta; os mesmos dados estão na tabela"></svg>
+    <div class="tax-ferramentas">
+      <label>Encontre seu nome <input type="search" id="tax-achar" list="tax-nomes" placeholder="Digite um nome" autocomplete="off"></label>
+      <datalist id="tax-nomes"></datalist>
+      <label>Agrupar por <select id="tax-agrupar"><option value="classe">Classe (ou filo)</option><option value="">Sem agrupamento</option></select></label>
+    </div>
+    <p class="tax-eu" id="tax-eu" aria-live="polite"></p>
+    <p class="meta"><b>Coordenação direta</b>: espécies dos grupos que a pessoa coordena, sem as dos subgrupos que têm coordenador próprio;
+      se o grupo tem mais de um coordenador, as espécies são divididas entre eles (÷N). Cada espécie conta para uma pessoa só.
+      <b>Abrangência</b>: todas as espécies dos grupos que a pessoa coordena. A pessoa fica na classe do grupo onde tem mais coordenação direta.
+      Clique no cabeçalho para ordenar.</p>
+    <table id="tabela-taxonomistas" aria-label="Taxonomistas: coordenação direta, abrangência, grupos e atividade">
       <thead><tr>
         <th scope="col" data-col="nome"><button type="button">Taxonomista</button></th>
-        <th scope="col" class="num" data-col="COORDENADOR"><button type="button">Coordena</button></th>
-        <th scope="col" class="num" data-col="COLABORADOR"><button type="button">Colabora</button></th>
-        <th scope="col" class="num" data-col="SOMENTE_AUTORIA"><button type="button">Só autoria</button></th>
-        <th scope="col" class="num" data-col="total"><button type="button">Total</button></th>
+        <th scope="col" data-col="direta" title="Espécies sem outro coordenador abaixo, divididas entre os coordenadores do grupo"><button type="button">Coordenação direta</button><small>espécies</small></th>
+        <th scope="col" data-col="abr" title="Todas as espécies dos grupos que a pessoa coordena"><button type="button">Abrangência</button><small>direta / total</small></th>
+        <th scope="col" class="num" data-col="nCoord"><button type="button">Coordena</button><small>grupos</small></th>
+        <th scope="col" class="num" data-col="nColab"><button type="button">Colabora</button><small>grupos</small></th>
+        <th scope="col" data-col="atividade" title="Última edição nos grupos que coordena"><button type="button">Atividade</button><small>última edição</small></th>
       </tr></thead>
       <tbody></tbody>
     </table>
