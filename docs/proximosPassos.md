@@ -26,6 +26,8 @@
 | 2026-10-14 | `site/completude/` | Painel lateral: botão "Ver as N espécies" no topo; seções "Os 18 atributos", "Domínio de Valores" e "Espécies" (nesta ordem) colapsáveis com `<details>`, abertas por padrão. |
 | 2026-10-14 | `site/comum/` | Cabeçalho de todas as páginas: marca (serif 1,2rem) e, abaixo, "Criado por Eduardo Dalcin - 2026 · Código no GitHub" (serif 1rem), ambos na cor do texto. Inserido por `comum.js`; saiu do rodapé. Repositório tornado público. |
 | 2026-10-14 | `site/*.html` | Código de rastreamento Matomo (`matomo.dalc.in`, site 12) antes de `</head>` nas 5 páginas públicas. |
+| 2026-10-16 | `site/grafo/` | Lista em árvore colapsável, tooltip nos nós, coluna da lista redimensionável. |
+| 2026-10-16 | `site/grafo/` | Aba **Taxonomistas**: coordenação direta (espécies sem outro coordenador abaixo, divididas ÷N entre coordenadores; soma = catálogo), abrangência (todas as espécies dos grupos coordenados), grupos coordenados/colaborados, atividade (última edição como coordenador). Faixa de pontos (log) com mediana; "Encontre seu nome"; agrupamento por classe (ou filo) do grupo de maior coordenação direta; ordenação por coluna. Painel e tooltip da pessoa trocam "sob responsabilidade" por coordenação direta + abrangência. Só autoria fica só no painel. Números: 148 coordenadores, mediana 423 espécies, 15 pessoas cobrem metade. Nomes e visualização escolhidos com `judge()`. |
 
 ## 2. Onde paramos
 
