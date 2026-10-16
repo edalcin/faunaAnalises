@@ -487,10 +487,14 @@ function marcarDist(uid) {
   const a = posDist.direta.get(uid), b = posDist.abr.get(uid), liga = dist.querySelector(".liga");
   liga.setAttribute("visibility", a && b ? "visible" : "hidden");
   if (a && b) { liga.setAttribute("x1", a.x); liga.setAttribute("y1", a.y); liga.setAttribute("x2", b.x); liga.setAttribute("y2", b.y); dist.append(liga); }
-  const l = LUID.get(uid);
-  distEu.innerHTML = `<b>${esc(l.nome)}</b>: ${num(l.direta)} espécies em coordenação direta, ${num(l.abr)} de abrangência` +
-    (l.abr ? ` (${Math.round(l.direta / l.abr * 100)}% da abrangência é coordenação direta).` : ". Não coordena grupos.") +
-    ` <button type="button" class="link" data-u="${uid}">Ver na tabela de taxonomistas</button>`;
+  const l = LUID.get(uid), acima = coordenadores.filter((x) => x.direta < l.direta).length;
+  distEu.innerHTML = `<h2 class="dist-nome">${esc(l.nome)}</h2>` +
+    `<p class="meta">${esc(U.get(uid).instituicao ?? "Instituição não informada")} · ${esc(G.get(l.classe).nome)}</p>` +
+    (l.abr ? `<div class="dist-num"><p class="direta"><b>${num(l.direta)}</b>coordenação direta</p><p class="abr"><b>${num(l.abr)}</b>abrangência</p></div>` +
+      `<p>${Math.round(l.direta / l.abr * 100)}% da abrangência é coordenação direta.` +
+      (l.direta ? ` Tem mais coordenação direta que ${Math.round(acima / coordenadores.length * 100)}% dos coordenadores.` : "") + `</p>`
+      : `<p>Não coordena grupos.</p>`) +
+    `<button type="button" class="botao" data-u="${uid}">Ver na tabela de taxonomistas →</button>`;
 }
 dist.addEventListener("click", (e) => { const c = e.target.closest("circle[data-u]"); if (c) { marcarDist(+c.dataset.u); distAchar.value = ""; } });
 const distAchar = document.getElementById("dist-achar");
