@@ -14,7 +14,7 @@ Projeto irmão de [faunabr](https://github.com/edalcin/faunabr), que guarda a pe
 ## Pipeline
 
 ```mermaid
-flowchart LR
+flowchart TD
   D[dump PostgreSQL<br>dados/*.dump] -->|pg_restore em Docker| P[(PostgreSQL temporário)]
   P -->|scripts/pg2sqlite.py| S[(dados/fauna.sqlite)]
   S -->|scripts/exportar_grafo.py| J[site/grafo/data/grafo.json]
