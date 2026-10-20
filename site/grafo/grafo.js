@@ -522,7 +522,7 @@ const achar = document.getElementById("tax-achar"), eu = document.getElementById
 const ROTULO = new Map(LINHAS.map((l) => [l.nome + (U.get(l.uid).instituicao ? ` (${U.get(l.uid).instituicao})` : ""), l.uid]));
 document.getElementById("tax-nomes").innerHTML = [...ROTULO.keys()].map((n) => `<option value="${esc(n)}">`).join("");
 let ordem = { col: "direta", desc: true }, selecionado = null;
-const abertos = new Set(); // classes começam colapsadas
+const classesAbertas = new Set(); // classes começam colapsadas
 const cmp = (a, b) => {
   const { col, desc } = ordem, s = desc ? -1 : 1;
   const r = col === "nome" || col === "atividade" ? a[col].localeCompare(b[col], "pt-BR") : a[col] - b[col];
@@ -544,7 +544,7 @@ function ordenarTax() {
   for (const l of ls) juntar(grupos, l.classe, l);
   const soma = (xs) => xs.reduce((s, l) => s + l.direta, 0);
   tabTax.tBodies[0].innerHTML = [...grupos].sort((a, b) => soma(b[1]) - soma(a[1])).map(([c, xs]) => {
-    const aberto = abertos.has(c);
+    const aberto = classesAbertas.has(c);
     return `<tr class="grupo-tax"><th colspan="6" scope="rowgroup"><button type="button" data-c="${c}" aria-expanded="${aberto}">` +
       `${aberto ? "▾" : "▸"} ${esc(G.get(c).nome)}</button> <span class="meta">${num(xs.length)} pessoas, ${num(xs.filter((l) => l.direta).length)} com coordenação direta</span></th></tr>` +
       (aberto ? xs.map(linhaTax).join("") : "");
@@ -552,7 +552,7 @@ function ordenarTax() {
 }
 function selecionarTax(uid) {
   selecionado = uid; const l = LUID.get(uid);
-  abertos.add(l.classe); ordenarTax();
+  classesAbertas.add(l.classe); ordenarTax();
   const acima = coordenadores.filter((x) => x.direta < l.direta).length;
   eu.innerHTML = `<b>${esc(l.nome)}</b>: ${num(l.direta)} espécies em coordenação direta` +
     (l.abr ? `, ${num(l.abr)} de abrangência` : "") +
@@ -566,7 +566,7 @@ tabTax.tHead.addEventListener("click", (e) => {
 });
 tabTax.tBodies[0].addEventListener("click", (e) => {
   const b = e.target.closest("button[data-c]"); if (!b) return;
-  const c = +b.dataset.c; abertos.has(c) ? abertos.delete(c) : abertos.add(c); ordenarTax();
+  const c = +b.dataset.c; classesAbertas.has(c) ? classesAbertas.delete(c) : classesAbertas.add(c); ordenarTax();
 });
 agrupar.addEventListener("change", ordenarTax);
 achar.addEventListener("input", () => ROTULO.has(achar.value) && selecionarTax(ROTULO.get(achar.value)));
