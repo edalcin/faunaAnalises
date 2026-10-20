@@ -8,7 +8,7 @@ Projeto irmão de [faunabr](https://github.com/edalcin/faunabr), que guarda a pe
 
 | Página | O que mostra |
 |---|---|
-| `site/grafo/` | Quem cuida de cada grupo da fauna brasileira: taxonomistas, grupos que coordenam e grupos órfãos. Abas: Grupos e responsáveis (lista + grafo de foco), Árvore dos grupos (radial), Taxonomistas (coordenação direta, abrangência e atividade de cada pessoa) e Distribuição da carga (duas faixas de pontos log, coordenação direta × abrangência, cor por atividade, cartão da pessoa e texto sobre a mediana). Método em `site/grafo/metodo.html`. |
+| `site/grafo/` | Quem cuida de cada grupo da fauna brasileira: taxonomistas, grupos que coordenam e grupos órfãos. Abas: Grupos e responsáveis (lista + grafo de foco), Árvore dos grupos (radial), Taxonomistas (coordenação direta, abrangência e atividade de cada pessoa), Instituições (taxonomistas, coordenadores, coordenação direta e inativos por instituição, colapsável) e Distribuição da carga (duas faixas de pontos log, coordenação direta × abrangência, cor por atividade, cartão da pessoa e texto sobre a mediana). Método em `site/grafo/metodo.html`. |
 | `site/completude/` | Completude de cada grupo da fauna brasileira: quanto dos 18 atributos das espécies aceitas está preenchido, por grupo e por domínio, com o Domínio de Valores de cada atributo. Método em `site/completude/metodo.html`. |
 
 ## Pipeline

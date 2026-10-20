@@ -406,7 +406,7 @@ function abrirArvore() {
 }
 
 // ---------- abas, tema e estado inicial ----------
-const abas = { "aba-lista": "vista-lista", "aba-arvore": "vista-arvore", "aba-taxonomistas": "vista-taxonomistas", "aba-distribuicao": "vista-distribuicao" };
+const abas = { "aba-lista": "vista-lista", "aba-arvore": "vista-arvore", "aba-taxonomistas": "vista-taxonomistas", "aba-instituicoes": "vista-instituicoes", "aba-distribuicao": "vista-distribuicao" };
 function mostrarAba(id) {
   for (const [a, v] of Object.entries(abas)) {
     document.getElementById(a).setAttribute("aria-selected", a === id);
@@ -572,6 +572,51 @@ agrupar.addEventListener("change", ordenarTax);
 achar.addEventListener("input", () => ROTULO.has(achar.value) && selecionarTax(ROTULO.get(achar.value)));
 distAchar.addEventListener("input", () => ROTULO.has(distAchar.value) && marcarDist(ROTULO.get(distAchar.value)));
 ordenarTax();
+
+// ---------- vista 5: instituições ----------
+const SEM_INST = "Não informada";
+const instDe = (uid) => { const i = U.get(uid).instituicao; return i && i !== "s/a" ? i : SEM_INST; };
+const porInst = new Map();
+for (const l of LINHAS) juntar(porInst, instDe(l.uid), l);
+const INST = [...porInst].map(([nome, xs]) => {
+  const cs = xs.filter((l) => l.nCoord > 0);
+  return { nome, xs: xs.sort((a, b) => b.direta - a.direta || a.nome.localeCompare(b.nome, "pt-BR")), n: xs.length,
+    nCoord: cs.length, direta: xs.reduce((s, l) => s + l.direta, 0), inativos: cs.filter((l) => atv(l) === "orfao").length };
+});
+const totalDireta = INST.reduce((s, i) => s + i.direta, 0) || 1, maxInst = Math.max(1, ...INST.map((i) => i.direta));
+const tabInst = document.getElementById("tabela-instituicoes"), instAbertas = new Set(); // instituições começam colapsadas
+let ordemInst = { col: "direta", desc: true };
+{ const top = [...INST].sort((a, b) => b.direta - a.direta); let acc = 0, k = 0;
+  while (acc < totalDireta / 2) acc += top[k++].direta;
+  document.getElementById("inst-lead").textContent = `${num(LINHAS.length)} taxonomistas de ${num(INST.filter((i) => i.nome !== SEM_INST).length)} instituições. ` +
+    `${num(k)} instituições fazem a coordenação direta de metade das espécies do catálogo.`; }
+const pessoaInst = (l) => `<li><a href="?u=${l.uid}">${esc(l.nome)}</a> <span class="meta">${l.direta ? `${num(l.direta)} espécies` : "sem coordenação direta"}</span>` +
+  (l.nCoord ? ` <i class="ponto ${atv(l)}" title="${ATV[atv(l)]}"></i>` : "") + `</li>`;
+function ordenarInst() {
+  const { col, desc } = ordemInst, s = desc ? -1 : 1;
+  for (const th of tabInst.querySelectorAll("th[data-col]"))
+    th.setAttribute("aria-sort", th.dataset.col === col ? (desc ? "descending" : "ascending") : "none");
+  const is = [...INST].sort((a, b) => s * (col === "nome" ? a.nome.localeCompare(b.nome, "pt-BR") : a[col] - b[col]) || a.nome.localeCompare(b.nome, "pt-BR"));
+  tabInst.tBodies[0].innerHTML = is.map((i) => {
+    const aberto = instAbertas.has(i.nome);
+    return `<tr class="grupo-tax"><th scope="row"><button type="button" data-i="${esc(i.nome)}" aria-expanded="${aberto}">${aberto ? "▾" : "▸"} ${esc(i.nome)}</button></th>` +
+      `<td class="num">${num(i.n)}</td><td class="num">${num(i.nCoord)}</td>` +
+      `<td class="barra-cel"><span class="barra"><i style="width:${i.direta / maxInst * 100}%"></i></span><span class="num">${num(i.direta)}</span>` +
+      ` <span class="meta">${(i.direta / totalDireta * 100).toLocaleString("pt-BR", { maximumFractionDigits: 1 })}%</span></td>` +
+      `<td class="num">${i.inativos ? `<i class="ponto orfao"></i> ${num(i.inativos)}` : '<span class="meta">0</span>'}</td></tr>` +
+      (aberto ? `<tr class="inst-pessoas"><td colspan="5"><ul>${i.xs.map(pessoaInst).join("")}</ul></td></tr>` : "");
+  }).join("");
+}
+tabInst.tHead.addEventListener("click", (e) => {
+  const col = e.target.closest("th[data-col]")?.dataset.col; if (!col) return;
+  ordemInst = { col, desc: ordemInst.col === col ? !ordemInst.desc : col !== "nome" };
+  ordenarInst();
+});
+tabInst.tBodies[0].addEventListener("click", (e) => {
+  const b = e.target.closest("button[data-i]"); if (!b) return;
+  const k = b.dataset.i; instAbertas.has(k) ? instAbertas.delete(k) : instAbertas.add(k); ordenarInst();
+});
+ordenarInst();
 addEventListener("tema", () => { cyF.style(estilo()); cyA?.style(estilo()); });
 controlesZoom(document.querySelector(".zoom[data-cy=foco]"), () => cyF);
 controlesZoom(document.querySelector(".zoom[data-cy=arvore]"), () => cyA);

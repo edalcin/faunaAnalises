@@ -153,3 +153,5 @@ tbody tr.contexto { color: var(--muted); }
 .div { font-size: .75rem; color: var(--muted); border: 1px solid var(--line); border-radius: 1rem; padding: 0 .4rem; }
 i.ponto { vertical-align: baseline; }
 .taxonomistas td + td { white-space: nowrap; }
+.inst-pessoas ul { margin: 0 0 .6rem; padding: 0 0 0 1.2rem; columns: 18rem; column-gap: 2rem; font-size: .88rem; }
+.inst-pessoas li { break-inside: avoid; padding: .1rem 0; }

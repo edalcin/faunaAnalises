@@ -37,6 +37,7 @@
   <button role="tab" id="aba-lista" aria-controls="vista-lista" aria-selected="true">Grupos e responsáveis</button>
   <button role="tab" id="aba-arvore" aria-controls="vista-arvore" aria-selected="false">Árvore dos grupos</button>
   <button role="tab" id="aba-taxonomistas" aria-controls="vista-taxonomistas" aria-selected="false">Taxonomistas</button>
+  <button role="tab" id="aba-instituicoes" aria-controls="vista-instituicoes" aria-selected="false">Instituições</button>
   <button role="tab" id="aba-distribuicao" aria-controls="vista-distribuicao" aria-selected="false">Distribuição da carga</button>
 </nav>
 <main>
@@ -104,6 +105,22 @@
         <th scope="col" class="num" data-col="nCoord"><button type="button">Coordena</button><small>grupos</small></th>
         <th scope="col" class="num" data-col="nColab"><button type="button">Colabora</button><small>grupos</small></th>
         <th scope="col" data-col="atividade" title="Última edição nos grupos que coordena"><button type="button">Atividade</button><small>última edição</small></th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+  </section>
+  <section id="vista-instituicoes" role="tabpanel" aria-labelledby="aba-instituicoes" class="vista taxonomistas" hidden>
+    <p class="lead" id="inst-lead"></p>
+    <p class="meta">Cada taxonomista conta para a instituição informada no cadastro do catálogo (uma só por pessoa; "s/a" e cadastro vazio entram em "Não informada").
+      <b>Coordenação direta</b>: soma da coordenação direta das pessoas da instituição; cada espécie conta para uma pessoa só, por isso a soma das instituições é o catálogo inteiro.
+      <b>Inativos</b>: coordenadores sem edição há mais de 3 anos. Clique numa instituição para ver as pessoas; clique no cabeçalho para ordenar.</p>
+    <table id="tabela-instituicoes" aria-label="Instituições: taxonomistas, coordenadores, coordenação direta e inativos">
+      <thead><tr>
+        <th scope="col" data-col="nome"><button type="button">Instituição</button></th>
+        <th scope="col" class="num" data-col="n"><button type="button">Taxonomistas</button><small>pessoas</small></th>
+        <th scope="col" class="num" data-col="nCoord"><button type="button">Coordenadores</button><small>pessoas</small></th>
+        <th scope="col" data-col="direta"><button type="button">Coordenação direta</button><small>espécies · % do catálogo</small></th>
+        <th scope="col" class="num" data-col="inativos" title="Coordenadores sem edição há mais de 3 anos"><button type="button">Inativos</button><small>coordenadores</small></th>
       </tr></thead>
       <tbody></tbody>
     </table>
