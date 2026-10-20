@@ -11,7 +11,7 @@ if (marca) {
   marca.replaceWith(bloco);
   bloco.append(marca);
   bloco.insertAdjacentHTML("beforeend", `<p class="credito">Criado por Eduardo Dalcin - 2026 ·
-    <a href="https://github.com/edalcin/faunaAnalises">Código no GitHub</a></p>`);
+    <a href="https://github.com/edalcin/faunaAnalises" target="_blank" rel="noopener">Código no GitHub</a></p>`);
 }
 
 export function iniciar({ referencia } = {}) {
