@@ -1,4 +1,4 @@
-import { iniciar } from "../comum/comum.js";
+import { iniciar } from "../comum/comum.js?v=d41d976";
 
 const D = await (await fetch("data/grafo.json")).json();
 iniciar({ referencia: D.referencia });

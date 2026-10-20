@@ -1,6 +1,6 @@
 // Completude de cada grupo da fauna brasileira: matriz com a árvore de grupos nas linhas e os 18 atributos nas colunas,
 // gaveta de detalhe do grupo e Domínio de Valores (valores.json, carregado sob demanda).
-import { iniciar } from "../comum/comum.js";
+import { iniciar } from "../comum/comum.js?v=d41d976";
 
 const N = (n) => n.toLocaleString("pt-BR");
 const soma = (v) => v.reduce((s, x) => s + x, 0);

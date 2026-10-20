@@ -106,7 +106,7 @@
 </main>
 <footer class="rodape"></footer>
 <script type="module">
-  import { iniciar } from "../comum/comum.js";
+  import { iniciar } from "../comum/comum.js?v=d41d976";
   const d = await (await fetch("data/completude.json")).json();
   iniciar({ referencia: d.referencia });
   document.getElementById("ref").textContent = d.referencia.split("-").reverse().join("/");

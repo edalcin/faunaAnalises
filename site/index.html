@@ -66,7 +66,7 @@
 </ul>
 <footer class="rodape"></footer>
 <script type="module">
-  import { iniciar } from "./comum/comum.js";
+  import { iniciar } from "./comum/comum.js?v=d41d976";
   const d = await (await fetch("grafo/data/grafo.json")).json();
   iniciar({ referencia: d.referencia });
   const orfaos = d.grupos.filter((g) => g.estado === "orfao").length;
