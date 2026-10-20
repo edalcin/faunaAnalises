@@ -34,7 +34,7 @@
 
 Mapa wayfinder [Completude de cada grupo da fauna brasileira](https://github.com/edalcin/faunaAnalises/issues/1) fechado: destino atingido em <https://web.dalc.in/faunabr/completude/>. Sem issues abertas. Próximo passo: escolher o tema da próxima análise e abrir novo mapa wayfinder.
 
-**Publicação:** copiar `site/` para `S:\appsdata\web.dalc.in\faunabr`. O HTML não fica em cache no Cloudflare; JS/CSS ficam 4 h (`max-age=14400`). Para o browser pegar a versão nova sem purgar o cache, trocar o `?v=<commit>` nos links de JS/CSS do `index.html` alterado (feito em `grafo/`). Se `comum/comum.js` mudar, trocar também o `?v=` nos 5 `import` dele (`index.html`, `*/metodo.html`, `grafo.js`, `completude.js`) e o `?v=` dos HTML que carregam esses JS. Commit/push **não** publica — a cópia é manual. Última publicação: `grafo/` em 2026-10-20 (`?v=d41d976`: aba Taxonomistas — grupos por classe começam colapsados; link "Código no GitHub" abre em nova janela).
+**Publicação:** `python scripts/publicar.py` (commit antes; o script recusa `site/` com mudanças sem commit). Ele copia `site/` para `S:\appsdata\web.dalc.in\faunabr` e, só na cópia, troca todo `?v=<hash>` (links de JS/CSS e `import` de `comum.js`) pelo commit atual — o browser e o Cloudflare (JS/CSS em cache 4 h, `max-age=14400`; HTML sem cache) pegam a versão nova. Arquivo novo de JS/CSS entra com `?v=0000000` no link para o script versioná-lo. Commit/push **não** publica. Última publicação: 2026-10-20 (aba Taxonomistas — grupos por classe começam colapsados; link "Código no GitHub" abre em nova janela).
 
 ## 3. Pendências e ideias
 

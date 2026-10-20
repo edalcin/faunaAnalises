@@ -37,9 +37,9 @@ flowchart TD
 3. **SQLite → JSON**:
    - `python scripts/exportar_grafo.py` (lê `dados/fauna.sqlite`, escreve `site/grafo/data/grafo.json`; ~3 s).
    - `python scripts/exportar_completude.py` (lê `dados/fauna.sqlite` e as listas CHECK de `dados/modeloERctf.md`, escreve `site/completude/data/{completude,valores}.json`; ~10 s).
-4. **Publicar**: copiar `site/` para `S:\appsdata\web.dalc.in\faunabr` (servidor nginx estático; já bloqueia `.sqlite`/`.db`).
+4. **Publicar** (depois do commit): copia `site/` para `S:\appsdata\web.dalc.in\faunabr` (servidor nginx estático; já bloqueia `.sqlite`/`.db`) e troca os `?v=` pelo commit atual, só na cópia.
    ```bash
-   cp -r site/. /s/appsdata/web.dalc.in/faunabr/
+   python scripts/publicar.py
    ```
 
 `dados/` e os JSON gerados ficam fora do git.
