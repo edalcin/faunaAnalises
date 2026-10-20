@@ -20,6 +20,7 @@ shutil.copytree(SITE, DESTINO, dirs_exist_ok=True)
 n = 0
 for f in DESTINO.rglob("*"):
     if f.suffix in (".html", ".js") and "vendor" not in f.parts:
+        s = f.read_text(encoding="utf-8")
         t = re.sub(r"\?v=[0-9a-f]{7,}\b", f"?v={v}", s)
         if t != s:
             f.write_text(t, encoding="utf-8", newline="")
